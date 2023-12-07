@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">MyHealth</string>
+    <string name="email">Email Address</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="create_myhealth_account">Create MyHealth account</string>
+    <string name="or_continue_with">Or continue with:</string>
+    <string name="i_m_already_a_member_sign_in">I\'m already a member, Sign in.</string>
+    <string name="sign_in">Sign in</string>
+    <string name="enter_details_to_continue">Enter details to continue</string>
+    <string name="i_m_a_new_user_sign_up">I\'m a new user, Sign up.</string>
+    <string name="myhealth">MyHealth</string>
+    <string name="all_your_medical_data_in_one_place">    all your medical data\nin one place</string>
+    <string name="preview">preview</string>
+</resources>
