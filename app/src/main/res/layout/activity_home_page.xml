@@ -15,7 +15,7 @@
         android:layout_marginTop="100dp"
         android:layout_marginBottom="45dp"
         android:text="@string/myhealth"
-        android:textSize="90sp"
+        android:textSize="45sp"
         android:textStyle="bold" />
 
     <TextView
@@ -36,7 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:layout_marginBottom="50dp"
-        android:src="@drawable/ic_launcher_background"
+        android:src="@mipmap/myhealthlogo"
         android:contentDescription="@string/preview"
         />
 
