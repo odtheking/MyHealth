@@ -13,4 +13,12 @@
     <string name="myhealth">MyHealth</string>
     <string name="all_your_medical_data_in_one_place">    all your medical data\nin one place</string>
     <string name="preview">preview</string>
+    <string name="welcome">Welcome!</string>
+    <string name="create_your_first_medical_case">Create your medical case:</string>
+    <string name="continuearrow">Continue ➡</string>
+    <string name="diabetes">Diabetes</string>
+    <string name="other">Other</string>
+    <string name="cancer">Cancer</string>
+    <string name="heart">Heart</string>
+    <string name="pregnancy">Pregnancy</string>
 </resources>

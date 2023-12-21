@@ -4,17 +4,12 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 
-class SignUp : ComponentActivity() {
+class CreateCase : ComponentActivity() {
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_sign_up)
+        setContentView(R.layout.activity_create_case)
 
-        openNewActivity(findViewById(R.id.button_signin), this, SignIn::class.java)
-
-        openNewActivity(findViewById(R.id.button_signup_app), this, CreateCase::class.java)
-
-
-
+        toggleButton(findViewById(R.id.diabetes))
     }
 }

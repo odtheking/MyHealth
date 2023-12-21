@@ -61,7 +61,7 @@
 
 
     <Button
-        android:id="@+id/button_signup"
+        android:id="@+id/button_signin_app"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:text="@string/sign_in"
@@ -107,6 +107,7 @@
         android:textSize="18sp"
         android:textAllCaps="false"
         android:background="?android:attr/selectableItemBackground"
+        android:minHeight="49dp"
 
         />
 

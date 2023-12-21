@@ -14,6 +14,4 @@ class HomePage : ComponentActivity() {
 
         openNewActivity(findViewById(R.id.button_signin), this, SignIn::class.java)
     }
-
-
 }

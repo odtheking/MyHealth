@@ -57,7 +57,7 @@
 
 
     <Button
-        android:id="@+id/button_signup"
+        android:id="@+id/button_signup_app"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:text="@string/sign_up"
