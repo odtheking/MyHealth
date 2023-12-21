@@ -70,6 +70,7 @@
         android:padding="1sp"
         android:background="#000000">
         <Button
+            android:id="@+id/cancer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/cancer"
@@ -90,6 +91,7 @@
         android:padding="1sp"
         android:background="#000000">
         <Button
+            android:id="@+id/heart"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/heart"
@@ -110,6 +112,7 @@
         android:padding="1sp"
         android:background="#000000">
         <Button
+            android:id="@+id/pregnancy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/pregnancy"
@@ -140,6 +143,7 @@
             />
 
         <Button
+            android:id="@+id/other"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/other"
@@ -155,7 +159,7 @@
 
 
     <Button
-        android:id="@+id/button_signin"
+        android:id="@+id/button_continue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
