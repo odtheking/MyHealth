@@ -1,10 +1,14 @@
 package com.example.myhealth
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import androidx.activity.ComponentActivity
+import androidx.annotation.RequiresApi
+import java.time.LocalDate
 
 class CreateCase : ComponentActivity() {
 
@@ -21,6 +25,7 @@ class CreateCase : ComponentActivity() {
         val square4: Button = findViewById(R.id.pregnancy)
         val square5: Button = findViewById(R.id.other)
         val continueButton: Button = findViewById(R.id.button_continue)
+
 
         setButtonClickListeners(square1, square2, square3, square4, square5)
         otherButton(square5)
@@ -54,17 +59,26 @@ class CreateCase : ComponentActivity() {
         lastClickedButton?.setBackgroundColor(Color.WHITE)
         button.setBackgroundColor(Color.CYAN)
         lastClickedButton = button
-        fileName = button.text.toString()
+        folderName = button.text.toString()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun makeFile(button: Button) {
         button.setOnClickListener {
-            if (fileName == "Other") {
+            if (folderName == "Other") {
                 showToast(this, "Please enter a valid case name")
             } else {
-                val file = createNewFile(fileName!!)
-                printFileStructure(file)
+                if (lastClickedButton == null) {
+                    showToast(this, "Please select a case")
+                    return@setOnClickListener
+                }
+                createNewFolder(folderName!!, LocalDate.now(), bigFolderList)
+                printFileStructure(bigFolderList[bigFolderList.size - 1])
                 showToast(this, "Case created")
+                val intent = Intent(this, MainMenu::class.java)
+                this.startActivity(intent)
+
+
             }
         }
     }

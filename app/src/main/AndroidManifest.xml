@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.myhealth">
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -11,29 +12,25 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/myhealthlogo_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light"
+        android:theme="@style/Base.Theme.AppCompat.Light"
         tools:targetApi="31">
         <activity
-            android:name=".CreateCase"
+            android:name=".DocumentActivity"
             android:exported="false" />
+        <activity android:name=".SubFolderActivity" />
+        <activity android:name=".MainMenu" />
+        <activity android:name=".CreateCase" />
         <activity
             android:name=".HomePage"
-            android:exported="true"
-            android:theme="@style/Theme.AppCompat.Light">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SignUp">
-
-            <!-- Add any additional configurations here -->
-        </activity>
-        <activity android:name=".SignIn">
-
-            <!-- Add any additional configurations here -->
-        </activity>
+        <activity android:name=".SignUp" />
+        <activity android:name=".SignIn" />
     </application>
 
 </manifest>

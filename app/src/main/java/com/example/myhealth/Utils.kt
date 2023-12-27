@@ -33,7 +33,7 @@ fun openTextInputDialog(context: Context, buttonToUpdate: Button) {
             if (enteredText.isNotEmpty()) {
                 showToast(context, "Entered Text: $enteredText")
                 buttonToUpdate.text = enteredText
-                fileName = enteredText
+                folderName = enteredText
             } else {
                 showToast(context, "Text is empty. Button text not changed.")
             }
@@ -52,6 +52,9 @@ fun openTextInputDialog(context: Context, buttonToUpdate: Button) {
 fun showToast(context: Context, message: String) {
     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 }
+
+
+
 
 
 
