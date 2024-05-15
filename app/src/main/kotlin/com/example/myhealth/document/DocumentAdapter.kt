@@ -1,4 +1,4 @@
-package com.example.myhealth
+package com.example.myhealth.document
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -14,6 +14,10 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
+import com.example.myhealth.utils.Document
+import com.example.myhealth.R
+import com.example.myhealth.utils.bigFolderList
+import com.example.myhealth.utils.showToast
 import java.time.LocalDate
 
 class DocumentAdapter(private var myObjects: List<Document>) :

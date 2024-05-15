@@ -1,4 +1,4 @@
-package com.example.myhealth
+package com.example.myhealth.document
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -18,6 +18,11 @@ import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.myhealth.utils.Document
+import com.example.myhealth.R
+import com.example.myhealth.utils.bigFolderList
+import com.example.myhealth.utils.createNewDocument
+import com.example.myhealth.utils.showToast
 import java.io.InputStream
 import java.time.LocalDate
 

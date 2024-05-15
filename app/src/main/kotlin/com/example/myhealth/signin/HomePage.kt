@@ -1,8 +1,10 @@
-package com.example.myhealth
+package com.example.myhealth.signin
 
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import com.example.myhealth.R
+import com.example.myhealth.utils.openNewActivity
 
 class HomePage : ComponentActivity() {
     @SuppressLint("MissingInflatedId")

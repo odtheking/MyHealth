@@ -1,4 +1,4 @@
-package com.example.myhealth
+package com.example.myhealth.utils
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -9,13 +9,9 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import com.example.myhealth.R
 
-fun openNewActivity(button: Button, context: Context, activityClass: Class<*>) {
-        button.setOnClickListener {
-            val intent = Intent(context, activityClass)
-            context.startActivity(intent)
-        }
-    }
+fun openNewActivity(button: Button, context: Context, activityClass: Class<*>) = button.setOnClickListener { context.startActivity(Intent(context, activityClass)) }
 
 @SuppressLint("MissingInflatedId")
 fun openTextInputDialog(context: Context, buttonToUpdate: Button) {

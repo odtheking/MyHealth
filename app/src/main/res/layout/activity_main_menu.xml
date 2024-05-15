@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    >
 
     <TextView
         android:id="@+id/textView_signup"
@@ -14,42 +14,91 @@
         android:textColor="@color/black"
         android:layout_marginTop="25dp"
         android:layout_marginBottom="30dp"
-        android:text="Your Medical Cases"
+        android:text="My Health"
         android:textSize="40sp"
         android:textStyle="bold" />
 
 
-
-    <Spinner
-        android:id="@+id/sortSpinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        tools:ignore="ObsoleteLayoutParam" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="40dp"
-        android:padding="16dp" />
-
-
-    <Button
-        android:id="@+id/circleButton"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
-        android:background="@drawable/circle_button_background"
-        android:layout_marginStart="285sp"
-        android:layout_marginTop="-120sp"
+        android:layout_height="wrap_content"
+        android:text="Your next appointment is in 3 days"
+        android:background="@color/cyan"
+        android:textSize="18sp"
+        android:textColor="#000000"
+        android:layout_gravity="center"
         android:gravity="center"
-        android:text="+"
-        android:textSize="50sp"
-        tools:ignore="HardcodedText">
+        android:padding="4dp"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/cyan"
+        android:gravity="center"
+        android:text="3/1/2024 - 10:00 AM - Dr. John Doe"
+        android:textColor="#000000"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:paddingBottom="5dp"/>
+
+    <GridLayout
+        android:id="@+id/image_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alignmentMode="alignMargins"
+
+        android:columnCount="2"
+        android:rowCount="2"
+        android:layout_centerInParent="true"
+        android:layout_margin="60dp"
+        android:layout_centerHorizontal="true">
+
+        <ImageView
+            android:id="@+id/drive"
+            android:layout_width="125dp"
+            android:layout_height="125dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:src="@drawable/folder"
+            android:layout_margin="4dp"
+            android:padding="2dp"/>
+
+        <ImageView
+            android:id="@+id/calendar"
+            android:layout_width="125dp"
+            android:layout_height="125dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:src="@drawable/calendar"
+            android:layout_margin="4dp"
+            android:padding="2dp"/>
+
+        <ImageView
+            android:id="@+id/document"
+            android:layout_width="125dp"
+            android:layout_height="125dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:src="@drawable/document"
+            android:layout_margin="4dp"
+            android:padding="2dp"/>
+
+        <ImageView
+            android:id="@+id/login"
+            android:layout_width="125dp"
+            android:layout_height="125dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:src="@drawable/loginimage"
+            android:layout_margin="4dp"
+            android:padding="2dp"/>
+
+    </GridLayout>
 
 
-    </Button>
+
+
 
 </LinearLayout>

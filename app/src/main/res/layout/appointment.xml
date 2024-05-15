@@ -1,0 +1,56 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    >
+
+    <!-- ImageView for the image at the middle-left -->
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/doctor"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="10sp"
+        />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textViewName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Doctor name"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:paddingStart="15sp"
+            android:textColor="@color/black"
+            android:layout_marginTop="2sp"/>
+
+        <TextView
+            android:id="@+id/textViewDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Doctor date"
+            android:paddingLeft="15sp"
+            android:paddingBottom="0sp"/>
+
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/buttonThreeDots"
+        android:layout_width="55sp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:background="?android:attr/selectableItemBackground"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"
+        android:text="≡"
+        android:textSize="40sp"
+        android:textStyle="bold"/>
+</LinearLayout>

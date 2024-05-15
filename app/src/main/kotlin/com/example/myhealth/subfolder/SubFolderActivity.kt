@@ -1,4 +1,4 @@
-package com.example.myhealth
+package com.example.myhealth.subfolder
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -15,6 +15,11 @@ import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.myhealth.R
+import com.example.myhealth.utils.SubFolder
+import com.example.myhealth.utils.bigFolderList
+import com.example.myhealth.utils.createNewSubFolder
+import com.example.myhealth.utils.showToast
 
 class SubFolderActivity : ComponentActivity() {
 

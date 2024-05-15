@@ -1,5 +1,7 @@
-package com.example.myhealth
+package com.example.myhealth.MainFolder
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
@@ -8,8 +10,12 @@ import android.widget.Spinner
 import androidx.activity.ComponentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.myhealth.R
+import com.example.myhealth.utils.Folder
+import com.example.myhealth.utils.bigFolderList
+import com.example.myhealth.utils.openNewActivity
 
-class MainMenu : ComponentActivity() {
+class MainFolder : ComponentActivity() {
 
     private lateinit var sortSpinner: Spinner
     private lateinit var recyclerView: RecyclerView
@@ -21,11 +27,16 @@ class MainMenu : ComponentActivity() {
         const val SORT_BY_NAME_DESCENDING = 2
     }
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main_menu)
+        setContentView(R.layout.activity_main_folder)
 
-        openNewActivity(findViewById(R.id.circleButton), this, CreateCase::class.java)
+        val createCase = findViewById<View>(R.id.createNewCaseButton)
+        createCase.isClickable = true
+        createCase.setOnClickListener {
+            this.startActivity(Intent(this, CreateCase::class.java))
+        }
         setupViews()
         setupRecyclerView()
         setupSortSpinner()
@@ -85,5 +96,4 @@ class MainMenu : ComponentActivity() {
     private fun updateAdapter(sortedList: List<Folder>) {
         folderAdapter.updateList(sortedList)
     }
-
 }
