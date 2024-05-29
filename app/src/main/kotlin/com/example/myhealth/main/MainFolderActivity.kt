@@ -1,4 +1,4 @@
-package com.example.myhealth.document
+package com.example.myhealth.main
 
 import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
@@ -15,7 +15,6 @@ import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myhealth.R
-import com.example.myhealth.signin.CreateCase
 import com.example.myhealth.utils.CurrentUser
 import com.example.myhealth.utils.Folder
 import com.example.myhealth.utils.bigFolderList

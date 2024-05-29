@@ -1,176 +1,185 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textView_signup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:textColor="@color/black"
-        android:layout_marginTop="100dp"
-        android:layout_marginBottom="30dp"
-        android:text="@string/welcome"
-        android:textSize="45sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/textView_or"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="45dp"
-        android:text="@string/create_your_first_medical_case"
-        android:textColor="@color/black"
-        android:textStyle="bold"
-        android:textSize="24sp"
-        />
-
-
-    <FrameLayout
-        android:layout_marginHorizontal="30sp"
-        android:layout_marginBottom="15sp"
+    <!-- Background image -->
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="1sp"
-        android:background="#000000">
-        <Button
-            android:id="@+id/diabetes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/diabetes"
-            android:background="@color/white"
-            android:textColor="@color/black"
-            android:padding="8sp"
-            android:textAllCaps="false"
-            android:textSize="25sp"
-            android:textAlignment="textStart"
+        android:layout_height="match_parent"
+        android:src="@drawable/background"
+        android:scaleType="centerCrop" /> <!-- Adjust scaleType as needed -->
 
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/textView_signup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@color/black"
+            android:layout_marginTop="100dp"
+            android:layout_marginBottom="30dp"
+            android:text="@string/welcome"
+            android:textSize="45sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textView_or"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="45dp"
+            android:text="@string/create_your_first_medical_case"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="24sp"
             />
+
 
         <FrameLayout
-            android:layout_width="30sp"
-            android:layout_height="30sp"
-            android:layout_gravity="end"
-            android:layout_margin="8sp"
+            android:layout_marginHorizontal="30sp"
+            android:layout_marginBottom="15sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:padding="1sp"
-            android:background="#000000"
-            />
-    </FrameLayout>
+            android:background="#000000">
+            <Button
+                android:id="@+id/diabetes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/diabetes"
+                android:background="@color/white"
+                android:textColor="@color/black"
+                android:padding="8sp"
+                android:textAllCaps="false"
+                android:textSize="25sp"
+                android:textAlignment="textStart"
 
-    <FrameLayout
-        android:layout_marginHorizontal="30sp"
-        android:layout_marginBottom="15sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="1sp"
-        android:background="#000000">
-        <Button
-            android:id="@+id/cancer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/cancer"
-            android:background="@color/white"
-            android:textColor="@color/black"
-            android:padding="8sp"
-            android:textAllCaps="false"
-            android:textSize="25sp"
-            android:textAlignment="textStart"
-            />
-    </FrameLayout>
+                />
 
-    <FrameLayout
-        android:layout_marginHorizontal="30sp"
-        android:layout_marginBottom="15sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="1sp"
-        android:background="#000000">
-        <Button
-            android:id="@+id/heart"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/heart"
-            android:background="@color/white"
-            android:textColor="@color/black"
-            android:padding="8sp"
-            android:textAllCaps="false"
-            android:textSize="25sp"
-            android:textAlignment="textStart"
-            />
-    </FrameLayout>
-
-    <FrameLayout
-        android:layout_marginHorizontal="30sp"
-        android:layout_marginBottom="15sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="1sp"
-        android:background="#000000">
-        <Button
-            android:id="@+id/pregnancy"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/pregnancy"
-            android:background="@color/white"
-            android:textColor="@color/black"
-            android:padding="8sp"
-            android:textAllCaps="false"
-            android:textSize="25sp"
-            android:textAlignment="textStart"
-            />
-    </FrameLayout>
-
-    <FrameLayout
-        android:layout_marginHorizontal="30sp"
-        android:layout_marginBottom="15sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="1sp"
-        android:background="#000000">
+            <FrameLayout
+                android:layout_width="30sp"
+                android:layout_height="30sp"
+                android:layout_gravity="end"
+                android:layout_margin="8sp"
+                android:padding="1sp"
+                android:background="#000000"
+                />
+        </FrameLayout>
 
         <FrameLayout
-            android:layout_width="30sp"
-            android:layout_height="30sp"
-            android:layout_gravity="end"
-            android:layout_margin="8sp"
-            android:padding="1sp"
-            android:background="#000000"
-            />
-
-        <Button
-            android:id="@+id/other"
+            android:layout_marginHorizontal="30sp"
+            android:layout_marginBottom="15sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/other"
-            android:background="@color/white"
+            android:padding="1sp"
+            android:background="#000000">
+            <Button
+                android:id="@+id/cancer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/cancer"
+                android:background="@color/white"
+                android:textColor="@color/black"
+                android:padding="8sp"
+                android:textAllCaps="false"
+                android:textSize="25sp"
+                android:textAlignment="textStart"
+                />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_marginHorizontal="30sp"
+            android:layout_marginBottom="15sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="1sp"
+            android:background="#000000">
+            <Button
+                android:id="@+id/heart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/heart"
+                android:background="@color/white"
+                android:textColor="@color/black"
+                android:padding="8sp"
+                android:textAllCaps="false"
+                android:textSize="25sp"
+                android:textAlignment="textStart"
+                />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_marginHorizontal="30sp"
+            android:layout_marginBottom="15sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="1sp"
+            android:background="#000000">
+            <Button
+                android:id="@+id/pregnancy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/pregnancy"
+                android:background="@color/white"
+                android:textColor="@color/black"
+                android:padding="8sp"
+                android:textAllCaps="false"
+                android:textSize="25sp"
+                android:textAlignment="textStart"
+                />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_marginHorizontal="30sp"
+            android:layout_marginBottom="15sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="1sp"
+            android:background="#000000">
+
+            <FrameLayout
+                android:layout_width="30sp"
+                android:layout_height="30sp"
+                android:layout_gravity="end"
+                android:layout_margin="8sp"
+                android:padding="1sp"
+                android:background="#000000"
+                />
+
+            <Button
+                android:id="@+id/other"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/other"
+                android:background="@color/white"
+                android:textColor="@color/black"
+                android:padding="8sp"
+                android:textAllCaps="false"
+                android:textSize="25sp"
+                android:textAlignment="textStart"
+                />
+
+        </FrameLayout>
+
+        <Button
+            android:id="@+id/button_continue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/create_case"
             android:textColor="@color/black"
-            android:padding="8sp"
-            android:textAllCaps="false"
+            android:layout_marginTop="110dp"
             android:textSize="25sp"
-            android:textAlignment="textStart"
+            android:textAllCaps="false"
+            android:minHeight="48dp"
             />
 
-    </FrameLayout>
-
-
-
-
-
-    <Button
-        android:id="@+id/button_continue"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/create_case"
-        android:textColor="@color/black"
-        android:layout_marginTop="110dp"
-        android:textSize="25sp"
-        android:textAllCaps="false"
-        android:minHeight="48dp"
-        />
-
-</LinearLayout>
+    </LinearLayout>
+</FrameLayout>

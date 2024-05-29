@@ -12,14 +12,13 @@ import android.widget.EditText
 import androidx.activity.ComponentActivity
 import com.example.myhealth.MainMenu
 import com.example.myhealth.R
+import com.example.myhealth.utils.db
 import com.example.myhealth.utils.openNewActivity
 import com.example.myhealth.utils.showToast
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 
 class SignUp : ComponentActivity() {
-
-    private val db = Firebase.firestore
 
     private lateinit var sharePreference: SharedPreferences
 

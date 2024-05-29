@@ -1,74 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".calender.CalenderActivity">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tvDoctorName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Doctor Name"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp" />
-
-    <EditText
-        android:id="@+id/etDoctorName"
+    <!-- Background image -->
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tvDoctorName"
-        android:layout_margin="16dp"
-        android:hint="Enter Doctor Name"
-        android:inputType="textPersonName" />
+        android:layout_height="match_parent"
+        android:src="@drawable/background"
+        android:scaleType="centerCrop" /> <!-- Adjust scaleType as needed -->
 
-    <TextView
-        android:id="@+id/tvDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Date"
-        android:layout_below="@id/etDoctorName"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp" />
-
-    <TextView
-        android:id="@+id/tvSelectedDate"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tvDate"
-        android:layout_margin="16dp"
-        android:hint="Select Date"
-        android:textSize="16sp"
-        android:padding="8dp"
-        android:background="?attr/selectableItemBackground" />
+        android:layout_height="match_parent"
+        tools:context=".calender.CalenderActivity">
 
-    <TextView
-        android:id="@+id/tvTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Time"
-        android:layout_below="@id/tvSelectedDate"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp" />
+        <TextView
+            android:id="@+id/tvDoctorName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Doctor Name"
+            android:textColor="@color/black"
+            android:textSize="22dp"
+            android:layout_marginTop="50dp"
+            android:layout_marginStart="16dp" />
 
-    <TextView
-        android:id="@+id/tvSelectedTime"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tvTime"
-        android:layout_margin="16dp"
-        android:hint="Select Time"
-        android:textSize="16sp"
-        android:padding="8dp"
-        android:background="?attr/selectableItemBackground" />
+        <EditText
+            android:id="@+id/etDoctorName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvDoctorName"
+            android:layout_margin="16dp"
+            android:background="#AC1BC5"
+            android:padding="8dp"
+            android:hint="Enter Doctor Name"
+            android:inputType="textPersonName" />
 
-    <Button
-        android:id="@+id/btnCreateAppointment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Create Appointment"
-        android:layout_below="@id/tvSelectedTime"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="32dp" />
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Date"
+            android:textSize="22dp"
+            android:textColor="@color/black"
+            android:layout_below="@id/etDoctorName"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp" />
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/tvSelectedDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvDate"
+            android:layout_margin="16dp"
+            android:hint="Select Date"
+            android:textSize="16sp"
+            android:padding="8dp"
+            android:background="#AC1BC5"
+            />
+
+        <TextView
+            android:id="@+id/tvTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Time"
+            android:textSize="22dp"
+            android:textColor="@color/black"
+            android:layout_below="@id/tvSelectedDate"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp" />
+
+        <TextView
+            android:id="@+id/tvSelectedTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvTime"
+            android:layout_margin="16dp"
+            android:hint="Select Time"
+            android:textSize="16sp"
+            android:background="#AC1BC5"
+
+            android:padding="8dp"
+             />
+
+        <Button
+            android:id="@+id/btnCreateAppointment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Create"
+            android:background="#AC1BC5"
+            android:layout_below="@id/tvSelectedTime"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="150dp" />
+
+    </RelativeLayout>
+</FrameLayout>

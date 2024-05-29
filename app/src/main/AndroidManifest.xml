@@ -16,12 +16,12 @@
         android:supportsRtl="true"
         android:theme="@style/Base.Theme.AppCompat.Light"
         tools:targetApi="31" >
-        <activity android:name=".document.MainFolderActivity" />
+        <activity android:name=".main.MainFolderActivity" />
         <activity android:name=".document.DocumentActivity" />
         <activity android:name=".subfolder.SubFolderActivity" />
         <activity android:name=".articles.ArticleActivity" />
         <activity android:name=".articles.ArticleDetailActivity" />
-        <activity android:name=".signin.CreateCase" />
+        <activity android:name=".main.CreateCase" />
         <activity android:name=".signin.HomePage" />
         <activity
             android:name=".MainMenu"

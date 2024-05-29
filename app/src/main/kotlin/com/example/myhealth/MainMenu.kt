@@ -1,13 +1,13 @@
 package com.example.myhealth
 
 import android.annotation.SuppressLint
+import android.app.ProgressDialog
 import android.content.ContentValues.TAG
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
@@ -17,35 +17,51 @@ import androidx.work.WorkManager
 import com.example.myhealth.articles.ArticleActivity
 import com.example.myhealth.calender.Appointment
 import com.example.myhealth.calender.AppointmentWorker
-import com.example.myhealth.document.MainFolderActivity
+import com.example.myhealth.main.MainFolderActivity
 import com.example.myhealth.calender.CalenderActivity
 import com.example.myhealth.calender.deleteAppointment
 import com.example.myhealth.calender.doctorsList
+import com.example.myhealth.signin.HomePage
 import com.example.myhealth.signin.SignUp
 import com.example.myhealth.utils.CurrentUser
 import com.example.myhealth.utils.db
 import com.example.myhealth.utils.showToast
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 
+/**
+ * The main menu screen of the application.
+ */
 class MainMenu : ComponentActivity() {
 
     private lateinit var sharePreference: SharedPreferences
 
+    /**
+     * Initializes the main menu activity.
+     * @param savedInstanceState The saved instance state.
+     */
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_menu)
 
+        // Initialize shared preferences
         sharePreference = getSharedPreferences("MyPrefsFile", MODE_PRIVATE) ?: return
+
+        // Check if user is logged in, if not, redirect to SignUp activity
         if (sharePreference.getString("email", "") == null) {
             this.startActivity(Intent(this, SignUp::class.java))
         } else if (sharePreference.getString("email", "") != null) {
+            // If user is logged in, show progress dialog and fetch appointments
+            val progressDialog = ProgressDialog(this)
+            progressDialog.setMessage("Logging in...")
+            progressDialog.setCancelable(false)
+            progressDialog.show()
+
             db.collection("users")
                 .get()
                 .addOnSuccessListener { result ->
@@ -58,44 +74,44 @@ class MainMenu : ComponentActivity() {
                         }
                         Log.d(TAG, "${document.id} => ${document.data}")
                     }
+                    progressDialog.dismiss()
                     fetchAppointments()
                 }
                 .addOnFailureListener { exception ->
+                    progressDialog.dismiss()
                     Log.w(TAG, "Error getting documents.", exception)
                 }
         }
 
-        val createCase = findViewById<View>(R.id.drive)
-        createCase.isClickable = true
-        createCase.setOnClickListener {
-            this.startActivity(Intent(this, MainFolderActivity::class.java))
+
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+
+        // Bottom navigation item click listener
+        bottomNavigationView.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_drive -> {
+                    this.startActivity(Intent(this, MainFolderActivity::class.java))
+                    false
+                }
+                R.id.nav_calendar -> {
+                    this.startActivity(Intent(this, CalenderActivity::class.java))
+                    false
+                }
+                R.id.nav_document -> {
+                    this.startActivity(Intent(this, ArticleActivity::class.java))
+                    false
+                }
+                else -> false
+            }
         }
 
-        val calendar = findViewById<View>(R.id.calendar)
-        calendar.isClickable = true
-        calendar.setOnClickListener {
-            this.startActivity(Intent(this, CalenderActivity::class.java))
-        }
-
-        val articles = findViewById<View>(R.id.document)
-        articles.isClickable = true
-        articles.setOnClickListener {
-            this.startActivity(Intent(this, ArticleActivity::class.java))
-        }
+        // Schedule periodic appointment check
         scheduleAppointmentCheck()
-
-        // Find the soonest appointment
-
-    //openNewActivity(findViewById(R.id.drive), this, CreateCase::class.java)
-
-        //openNewActivity(findViewById(R.id.calendar), this, Calendar::class.java)
-
-        //openNewActivity(findViewById(R.id.document), this, History::class.java)
-
-        //openNewActivity(findViewById(R.id.login), this, Settings::class.java)
-
     }
 
+    /**
+     * Fetches the user's appointments from Firestore.
+     */
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("NotifyDataSetChanged")
     private fun fetchAppointments() {
@@ -114,15 +130,15 @@ class MainMenu : ComponentActivity() {
                     Log.d(TAG, "${document.id} => $doctorName")
                 }
                 updateSoonestAppointment()
-                getSoonestAppointment()
             }
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error getting documents: ", e)
             }
     }
 
-
-
+    /**
+     * Updates the UI with the details of the soonest appointment.
+     */
     @RequiresApi(Build.VERSION_CODES.O)
     private fun updateSoonestAppointment() {
         val dateFormatter = DateTimeFormatter.ofPattern("d-M-yyyy")
@@ -148,7 +164,9 @@ class MainMenu : ComponentActivity() {
         }
     }
 
-
+    /**
+     * Schedules a periodic check for appointments using WorkManager.
+     */
     private fun scheduleAppointmentCheck() {
         val constraints = Constraints.Builder()
             .setRequiresCharging(false)
@@ -162,6 +180,7 @@ class MainMenu : ComponentActivity() {
         WorkManager.getInstance(this).enqueue(workRequest)
     }
 }
+
 
 
 @RequiresApi(Build.VERSION_CODES.O)

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_calendar"
+        android:icon="@drawable/calenderb"
+        android:title="Calendar" />
+    <item
+        android:id="@+id/nav_document"
+        android:icon="@drawable/document"
+        android:title="Articles" />
+    <item
+        android:id="@+id/nav_drive"
+        android:icon="@drawable/folderb"
+        android:title="Files" />
+</menu>

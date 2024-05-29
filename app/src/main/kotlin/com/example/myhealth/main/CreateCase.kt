@@ -1,4 +1,4 @@
-package com.example.myhealth.signin
+package com.example.myhealth.main
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -10,7 +10,6 @@ import android.widget.Button
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import com.example.myhealth.R
-import com.example.myhealth.document.MainFolderActivity
 import com.example.myhealth.utils.CurrentUser
 import com.example.myhealth.utils.createNewFolder
 import com.example.myhealth.utils.folderName
