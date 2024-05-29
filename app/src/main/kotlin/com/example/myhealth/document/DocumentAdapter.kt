@@ -14,15 +14,18 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
-import com.example.myhealth.utils.Document
 import com.example.myhealth.R
+import com.example.myhealth.utils.Document
 import com.example.myhealth.utils.bigFolderList
+import com.example.myhealth.utils.deleteDocument
+import com.example.myhealth.utils.editDocument
 import com.example.myhealth.utils.showToast
 import java.time.LocalDate
 
 class DocumentAdapter(private var myObjects: List<Document>) :
     RecyclerView.Adapter<DocumentAdapter.MyObjectViewHolder>() {
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("NotifyDataSetChanged")
     fun updateList(newList: List<Document>) {
         myObjects = newList
@@ -30,8 +33,7 @@ class DocumentAdapter(private var myObjects: List<Document>) :
     }
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyObjectViewHolder {
-        val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.item_document, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_document, parent, false)
         return MyObjectViewHolder(view)
     }
 
@@ -77,14 +79,14 @@ class DocumentAdapter(private var myObjects: List<Document>) :
     fun handleThreeDotsClick(position: Int, context: Context) {
         val options = arrayOf("Share", "Rename", "Change Date", "Remove")
         // TODO (Implement folder sharing currently sharing a single string)
-        val shareContent = bigFolderList[position].name
+
 
         // Create AlertDialog.Builder
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Options")
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> shareFunction(context, shareContent)
+                    0 -> shareFunction(context)
                     1 -> renameFunction(context, position)
                     2 -> changeDateFunction(context, position)
                     3 -> removeFunction(context, position)
@@ -97,12 +99,10 @@ class DocumentAdapter(private var myObjects: List<Document>) :
         dialog.show()
     }
 
-    private fun shareFunction(context: Context, shareContent: String) {
+    private fun shareFunction(context: Context) {
         val intent = Intent(Intent.ACTION_SEND)
         intent.type = "text/plain"
         intent.putExtra(Intent.EXTRA_SUBJECT, "Subject") // Optional subject
-        intent.putExtra(Intent.EXTRA_TEXT, shareContent)
-
 
         try {
             context.startActivity(Intent.createChooser(intent, "Share via"))
@@ -111,6 +111,7 @@ class DocumentAdapter(private var myObjects: List<Document>) :
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId", "NotifyDataSetChanged")
     private fun renameFunction(context: Context, position: Int) {
         val builder = AlertDialog.Builder(context)
@@ -119,19 +120,20 @@ class DocumentAdapter(private var myObjects: List<Document>) :
         val view: View = inflater.inflate(R.layout.dialog_text_input, null)
         val editText: EditText = view.findViewById(R.id.editText)
         val intent = Intent(context, DocumentActivity::class.java)
-        val folderpos = intent.getStringExtra("positionFolder") ?: "0"
-        val subFolderPos = intent.getStringExtra("position") ?: "0"
+        val folderId = intent.getStringExtra("folderId") ?: return
+        val subFolderId = intent.getStringExtra("subFolderId") ?: return
 
         builder.setView(view)
             .setTitle("Enter Text")
             .setPositiveButton("OK") { dialog, _ ->
                 // Handle OK button click events here
                 val enteredText = editText.text.toString()
-                bigFolderList[folderpos.toInt()].subFiles[subFolderPos.toInt()].documents[position].name = enteredText
-                notifyDataSetChanged()
+
                 if (enteredText.isNotEmpty()) {
                     showToast(context, "Entered Text: $enteredText")
-
+                    val document = bigFolderList.find { it.folderId == folderId }?.subFolders?.find { it.subFolderId == subFolderId }?.documents?.get(position) ?: return@setPositiveButton
+                    document.name = enteredText
+                    editDocument(folderId, subFolderId, document)
                 } else {
                     showToast(context, "Text is empty. Button text not changed.")
                 }
@@ -158,16 +160,15 @@ class DocumentAdapter(private var myObjects: List<Document>) :
         val view: View = inflater.inflate(R.layout.dialog_date_picker, null)
         val datePicker: DatePicker = view.findViewById(R.id.datePicker)
         val intent = Intent(context, DocumentActivity::class.java)
-        val folderpos = intent.getStringExtra("positionFolder") ?: "0"
-        val subFolderPos = intent.getStringExtra("position") ?: "0"
+        val folderId = intent.getStringExtra("folderId") ?: return
+        val subFolderId = intent.getStringExtra("subFolderId") ?: return
 
         builder.setView(view)
             .setTitle("Select Date")
             .setPositiveButton("OK") { dialog, _ ->
-                // Handle OK button click events here
                 val selectedDate = getDateFromDatePicker(datePicker)
-                bigFolderList[folderpos.toInt()].subFiles[subFolderPos.toInt()].documents[position].date = selectedDate
-                notifyDataSetChanged()
+                val document = bigFolderList.find { it.folderId == folderId }?.subFolders?.find { it.subFolderId == subFolderId }?.documents?.get(position) ?: return@setPositiveButton
+                editDocument(folderId, subFolderId, document)
                 showToast(context, "Selected Date: $selectedDate")
                 dialog.dismiss()
             }
@@ -184,28 +185,22 @@ class DocumentAdapter(private var myObjects: List<Document>) :
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getDateFromDatePicker(datePicker: DatePicker): LocalDate {
         val year = datePicker.year
-        val month = datePicker.month + 1 // Month is zero-based
+        val month = datePicker.month + 1
         val day = datePicker.dayOfMonth
         return LocalDate.of(year, month, day)
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("NotifyDataSetChanged")
     private fun removeFunction(context: Context, position: Int) {
         val intent = Intent(context, DocumentActivity::class.java)
-        val folderpos = intent.getStringExtra("positionFolder") ?: "0"
-        val subFolderPos = intent.getStringExtra("position") ?: "0"
+        val folderId = intent.getStringExtra("folderId") ?: return
+        val subFolderId = intent.getStringExtra("subFolderId") ?: return
 
-        bigFolderList[folderpos.toInt()].subFiles[subFolderPos.toInt()].documents.removeAt(position)
+        deleteDocument(folderId, subFolderId, position)
 
-        notifyDataSetChanged()
         showToast(context, "Remove clicked for item at position $position")
     }
-
-
-
-
-
-
 
 }

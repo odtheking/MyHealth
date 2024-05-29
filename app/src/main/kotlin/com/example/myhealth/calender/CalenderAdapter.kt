@@ -2,9 +2,9 @@ package com.example.myhealth.calender
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.content.Context
-import android.content.Intent
+import android.content.ContentValues.TAG
 import android.os.Build
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,18 +14,20 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
-import com.example.myhealth.document.DocumentActivity
 import com.example.myhealth.R
-import com.example.myhealth.utils.SubFolder
-import com.example.myhealth.utils.bigFolderList
+import com.example.myhealth.utils.CurrentUser
+import com.example.myhealth.utils.db
+import com.example.myhealth.utils.getDateFromDatePicker
 import com.example.myhealth.utils.showToast
-import java.time.LocalDate
+import java.util.Calendar
 
-class CalenderAdapter(private var myObjects: List<SubFolder>) :
+class CalenderAdapter(private var myObjects: List<Appointment>) :
     RecyclerView.Adapter<CalenderAdapter.MyObjectViewHolder>() {
 
+
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("NotifyDataSetChanged")
-    fun updateList(newList: List<SubFolder>) {
+    fun updateList(newList: List<Appointment>) {
         myObjects = newList
         notifyDataSetChanged()
     }
@@ -53,32 +55,16 @@ class CalenderAdapter(private var myObjects: List<SubFolder>) :
         private val buttonThreeDots: Button = itemView.findViewById(R.id.buttonThreeDots)
 
         init {
-            // Set click listener for the entire item
-            itemView.setOnClickListener {
-                handleItemClick()
-            }
-
-            // Set click listener for the three-dots button
             buttonThreeDots.setOnClickListener {
                 handleThreeDotsClick()
             }
         }
 
-        fun bind(myObject: SubFolder) {
-            textViewName.text = myObject.name
-            textViewDescription.text = myObject.date.toString()
+        @SuppressLint("SetTextI18n")
+        fun bind(myObject: Appointment) {
+            textViewName.text = myObject.doctorName
+            textViewDescription.text = "${myObject.date} - ${myObject.time}"
         }
-
-        private fun handleItemClick() {
-            val position = adapterPosition
-            if (position != RecyclerView.NO_POSITION) {
-                val intent = Intent(itemView.context, DocumentActivity::class.java)
-                intent.putExtra("position", position.toString())
-                intent.putExtra("positionFolder", intent.getStringExtra("position"))
-                itemView.context.startActivity(intent)
-            }
-        }
-
 
         @RequiresApi(Build.VERSION_CODES.O)
         private fun handleThreeDotsClick() {
@@ -96,9 +82,9 @@ class CalenderAdapter(private var myObjects: List<SubFolder>) :
             builder.setTitle("Options")
                 .setItems(options) { _, which ->
                     when (which) {
-                        0 -> renameFunction(itemView.context, position)
-                        1 -> changeDateFunction(itemView.context, position)
-                        2 -> removeFunction(itemView.context, position)
+                        0 -> renameFunction(position)
+                        1 -> changeDateFunction(position)
+                        2 -> removeFunction(position)
                     }
                 }
                 .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
@@ -107,32 +93,31 @@ class CalenderAdapter(private var myObjects: List<SubFolder>) :
             dialog.show()
         }
 
-        @SuppressLint("MissingInflatedId", "NotifyDataSetChanged")
-        private fun renameFunction(context: Context, position: Int) {
+        @SuppressLint("NotifyDataSetChanged")
+        private fun renameFunction(position: Int) {
+            val context = itemView.context
             val builder = AlertDialog.Builder(context)
             val inflater = LayoutInflater.from(context)
 
             val view: View = inflater.inflate(R.layout.dialog_text_input, null)
             val editText: EditText = view.findViewById(R.id.editText)
-            val intent = Intent(context, Calender::class.java)
-            val folderpos = intent.getStringExtra("positionFolder") ?: "0"
 
             builder.setView(view)
                 .setTitle("Enter Text")
                 .setPositiveButton("OK") { dialog, _ ->
-                    // Handle OK button click events here
                     val enteredText = editText.text.toString()
-                    bigFolderList[folderpos.toInt()].subFiles[position].name = enteredText
-                    notifyDataSetChanged()
+
                     if (enteredText.isNotEmpty()) {
                         showToast(context, "Entered Text: $enteredText")
+
+                        editAppointment(Appointment(enteredText, doctorsList[position].date, doctorsList[position].time, doctorsList[position].id))
+                        notifyDataSetChanged()
                     } else {
                         showToast(context, "Text is empty. Button text not changed.")
                     }
                     dialog.dismiss()
                 }
                 .setNegativeButton("Cancel") { dialog, _ ->
-                    // Handle cancel button click events here
                     showToast(context, "Dialog canceled")
                     dialog.dismiss()
                 }
@@ -143,27 +128,28 @@ class CalenderAdapter(private var myObjects: List<SubFolder>) :
 
         @RequiresApi(Build.VERSION_CODES.O)
         @SuppressLint("MissingInflatedId", "NotifyDataSetChanged")
-        private fun changeDateFunction(context: Context, position: Int) {
+        private fun changeDateFunction(position: Int) {
+            val context = itemView.context
             val builder = AlertDialog.Builder(context)
             val inflater = LayoutInflater.from(context)
 
             val view: View = inflater.inflate(R.layout.dialog_date_picker, null)
             val datePicker: DatePicker = view.findViewById(R.id.datePicker)
-            val intent = Intent(context, Calender::class.java)
-            val folderPos = intent.getStringExtra("positionFolder") ?: "0"
 
             builder.setView(view)
                 .setTitle("Select Date")
                 .setPositiveButton("OK") { dialog, _ ->
-                    // Handle OK button click events here
                     val selectedDate = getDateFromDatePicker(datePicker)
-                    bigFolderList[folderPos.toInt()].subFiles[position].date = selectedDate
-                    notifyDataSetChanged()
+                    val year = selectedDate.year
+                    val month = selectedDate.monthValue
+                    val day = selectedDate.dayOfMonth
+                    editAppointment(Appointment(doctorsList[position].doctorName, "$day-${month + 1}-$year", doctorsList[position].time, doctorsList[position].id))
+
                     showToast(context, "Selected Date: $selectedDate")
+                    updateList(doctorsList)
                     dialog.dismiss()
                 }
                 .setNegativeButton("Cancel") { dialog, _ ->
-                    // Handle cancel button click events here
                     showToast(context, "Dialog canceled")
                     dialog.dismiss()
                 }
@@ -172,26 +158,43 @@ class CalenderAdapter(private var myObjects: List<SubFolder>) :
             dialog.show()
         }
 
-        @RequiresApi(Build.VERSION_CODES.O)
-        private fun getDateFromDatePicker(datePicker: DatePicker): LocalDate {
-            val year = datePicker.year
-            val month = datePicker.month + 1 // Month is zero-based
-            val day = datePicker.dayOfMonth
-
-            return LocalDate.of(year, month, day)
+        @SuppressLint("NotifyDataSetChanged")
+        private fun removeFunction(position: Int) {
+            val context = itemView.context
+            deleteAppointment(doctorsList[position])
+            showToast(context, "Remove clicked for item at position $position")
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private fun removeFunction(context: Context, position: Int) {
-        val intent = Intent(context, Calender::class.java)
-        val folderpos = intent.getStringExtra("positionFolder") ?: "0"
+    fun editAppointment(appointment: Appointment) {
+        if (appointment.id.isNotEmpty()) {
+            db.collection("users").document(CurrentUser.instance.id).collection("appointments").document(appointment.id)
+                .update(
+                    "doctorName", appointment.doctorName,
+                    "date", appointment.date,
+                    "time", appointment.time,
+                    "id", appointment.id
+                )
+                .addOnSuccessListener {
+                    Log.d(TAG, "Appointment updated successfully")
+                }
+                .addOnFailureListener { exception ->
+                    Log.w(TAG, "Error updating appointment", exception)
+                }
+        } else {
+            Log.w(TAG, "Appointment ID is null. Cannot update.")
+        }
 
-        bigFolderList[folderpos.toInt()].subFiles.remove(bigFolderList[folderpos.toInt()].subFiles[position])
-
-        notifyDataSetChanged()
-        showToast(context, "Remove clicked for item at position $position")
     }
+}
 
-
+fun deleteAppointment(appointment: Appointment) {
+    db.collection("users").document(CurrentUser.instance.id).collection("appointments").document(appointment.id)
+        .delete()
+        .addOnSuccessListener {
+            Log.d(TAG, "Appointment deleted successfully")
+        }
+        .addOnFailureListener { exception ->
+            Log.w(TAG, "Error deleting appointment", exception)
+        }
 }

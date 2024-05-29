@@ -1,4 +1,4 @@
-package com.example.myhealth.MainFolder
+package com.example.myhealth.document
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -13,16 +13,19 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
-import com.example.myhealth.utils.Folder
 import com.example.myhealth.R
-import com.example.myhealth.utils.bigFolderList
-import com.example.myhealth.utils.showToast
 import com.example.myhealth.subfolder.SubFolderActivity
-import java.time.LocalDate
+import com.example.myhealth.utils.Folder
+import com.example.myhealth.utils.bigFolderList
+import com.example.myhealth.utils.deleteFolder
+import com.example.myhealth.utils.editFolder
+import com.example.myhealth.utils.getDateFromDatePicker
+import com.example.myhealth.utils.showToast
 
 class FolderAdapter(private var myObjects: List<Folder>) :
     RecyclerView.Adapter<FolderAdapter.MyObjectViewHolder>() {
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("NotifyDataSetChanged")
     fun updateList(newList: List<Folder>) {
         myObjects = newList
@@ -70,7 +73,8 @@ class FolderAdapter(private var myObjects: List<Folder>) :
             val position = adapterPosition
             if (position != RecyclerView.NO_POSITION) {
                 val intent = Intent(itemView.context, SubFolderActivity::class.java)
-                intent.putExtra("position", adapterPosition.toString())
+                intent.putExtra("folderId", myObjects[position].folderId)
+                println("putting id: ${myObjects[position].folderId}")
                 itemView.context.startActivity(intent)
             }
         }
@@ -115,13 +119,14 @@ class FolderAdapter(private var myObjects: List<Folder>) :
                 .setTitle("Enter Text")
                 .setPositiveButton("OK") { dialog, _ ->
                     val enteredText = editText.text.toString()
-                    bigFolderList[position].name = enteredText
-                    notifyDataSetChanged()
                     if (enteredText.isNotEmpty()) {
                         showToast(context, "Entered Text: $enteredText")
-                    } else {
+                        val folder = bigFolderList[position]
+                        folder.name = enteredText
+                        editFolder(folder)
+                    } else
                         showToast(context, "Text is empty. Button text not changed.")
-                    }
+
                     dialog.dismiss()
                 }
                 .setNegativeButton("Cancel") { dialog, _ ->
@@ -147,9 +152,9 @@ class FolderAdapter(private var myObjects: List<Folder>) :
                 .setTitle("Select Date")
                 .setPositiveButton("OK") { dialog, _ ->
                     val selectedDate = getDateFromDatePicker(datePicker)
-                    bigFolderList[position].date = selectedDate
-                    notifyDataSetChanged()
-                    showToast(context, "Selected Date: $selectedDate")
+                    val folder = bigFolderList[position]
+                    folder.date = selectedDate
+                    editFolder(folder)
                     dialog.dismiss()
                 }
                 .setNegativeButton("Cancel") { dialog, _ ->
@@ -164,17 +169,9 @@ class FolderAdapter(private var myObjects: List<Folder>) :
         @SuppressLint("NotifyDataSetChanged")
         private fun removeFunction(position: Int) {
             val context = itemView.context
-            bigFolderList.remove(bigFolderList[position])
-            updateList(bigFolderList)
+            val folder = bigFolderList[position]
+            deleteFolder(folder.folderId)
             showToast(context, "Remove clicked for item at position $position")
-        }
-
-        @RequiresApi(Build.VERSION_CODES.O)
-        private fun getDateFromDatePicker(datePicker: DatePicker): LocalDate {
-            val year = datePicker.year
-            val month = datePicker.month + 1 // Month is zero-based
-            val day = datePicker.dayOfMonth
-            return LocalDate.of(year, month, day)
         }
     }
 }

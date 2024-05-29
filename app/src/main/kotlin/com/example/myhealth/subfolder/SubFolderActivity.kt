@@ -2,8 +2,10 @@ package com.example.myhealth.subfolder
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.ContentValues.TAG
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
@@ -16,16 +18,19 @@ import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myhealth.R
+import com.example.myhealth.utils.CurrentUser
 import com.example.myhealth.utils.SubFolder
 import com.example.myhealth.utils.bigFolderList
 import com.example.myhealth.utils.createNewSubFolder
+import com.example.myhealth.utils.db
+import com.example.myhealth.utils.mapToFolder
 import com.example.myhealth.utils.showToast
 
 class SubFolderActivity : ComponentActivity() {
 
     private lateinit var sortSpinner: Spinner
     private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: SubFolderAdapter
+    private lateinit var subFolderAdapter: SubFolderAdapter
     private lateinit var caseNameTextView: TextView
 
     companion object {
@@ -45,6 +50,7 @@ class SubFolderActivity : ComponentActivity() {
         setupCaseName()
         setupSortSpinner()
         setupPlusButton()
+        setupRealtimeUpdates()
     }
 
     private fun initViews() {
@@ -55,14 +61,16 @@ class SubFolderActivity : ComponentActivity() {
 
     private fun setupRecyclerView() {
         recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter = SubFolderAdapter(emptyList()) // Initial empty list
-        recyclerView.adapter = adapter
+        subFolderAdapter = SubFolderAdapter(emptyList()) // Initial empty list
+        recyclerView.adapter = subFolderAdapter
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
     private fun setupCaseName() {
-        val position = intent.getStringExtra("position")
-        val folder = bigFolderList[position!!.toInt()]
+        val folderId = intent.getStringExtra("folderId")
+        println("bigFolderList: ${bigFolderList.map { it.name }}, folderId: $folderId")
+        val folder = bigFolderList.find { it.folderId == folderId } ?: return
         caseNameTextView.text = "My ${folder.name}"
     }
 
@@ -73,6 +81,7 @@ class SubFolderActivity : ComponentActivity() {
         sortSpinner.adapter = adapter
 
         sortSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            @RequiresApi(Build.VERSION_CODES.O)
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 handleSorting(position)
             }
@@ -91,11 +100,14 @@ class SubFolderActivity : ComponentActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun handleSorting(sortOption: Int) {
+        val folderId = intent.getStringExtra("folderId")
+        val folder = bigFolderList.find { it.folderId == folderId } ?: return
         when (sortOption) {
-            SORT_BY_DATE -> sortByDate(bigFolderList[intent.getStringExtra("position")?.toInt()!!].subFiles)
-            SORT_BY_NAME_ASCENDING -> sortByNameAscending(bigFolderList[intent.getStringExtra("position")?.toInt()!!].subFiles)
-            SORT_BY_NAME_DESCENDING -> sortByNameDescending(bigFolderList[intent.getStringExtra("position")?.toInt()!!].subFiles)
+            SORT_BY_DATE -> sortByDate(folder.subFolders)
+            SORT_BY_NAME_ASCENDING -> sortByNameAscending(folder.subFolders)
+            SORT_BY_NAME_DESCENDING -> sortByNameDescending(folder.subFolders)
         }
     }
 
@@ -112,9 +124,13 @@ class SubFolderActivity : ComponentActivity() {
             .setPositiveButton("OK") { dialog, _ ->
                 // Handle OK button click events here
                 val enteredText = editText.text.toString()
-                createNewSubFolder(enteredText, biggerFolder = bigFolderList[intent.getIntExtra("position", 0)])
 
                 if (enteredText.isNotEmpty()) {
+                    val folderId = intent.getStringExtra("folderId")
+                    println("FOLDER ID: $folderId, bigfolder folderid: ${bigFolderList.map { it.folderId }}")
+                    val folder = bigFolderList.find { it.folderId == folderId } ?: return@setPositiveButton println("FOLDER ID: $folderId, BIG FOLDER LIST: $bigFolderList")
+
+                    createNewSubFolder(enteredText, folderId = folder.folderId)
                     showToast(this, "Entered Text: $enteredText")
                 } else {
                     showToast(this, "Text is empty. Button text not changed.")
@@ -131,22 +147,51 @@ class SubFolderActivity : ComponentActivity() {
         dialog.show()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun sortByDate(unSortedList: List<SubFolder>) {
         val sortedList = unSortedList.sortedBy { it.date }
         updateAdapter(sortedList)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun sortByNameAscending(unSortedList: List<SubFolder>) {
         val sortedList = unSortedList.sortedBy { it.name }
         updateAdapter(sortedList)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun sortByNameDescending(unSortedList: List<SubFolder>) {
         val sortedList = unSortedList.sortedByDescending { it.name }
         updateAdapter(sortedList)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun updateAdapter(sortedList: List<SubFolder>) {
-        adapter.updateList(sortedList)
+        subFolderAdapter.updateList(sortedList)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @SuppressLint("NotifyDataSetChanged")
+    private fun setupRealtimeUpdates() {
+        if (CurrentUser.instance.id.isEmpty()) return
+        val folderId = intent.getStringExtra("folderId")
+        val folder = bigFolderList.find { it.folderId == folderId } ?: return
+        db.collection("users").document(CurrentUser.instance.id).collection("cases")
+            .addSnapshotListener { snapshots, e ->
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e)
+                    return@addSnapshotListener
+                }
+
+                if (snapshots == null) return@addSnapshotListener
+
+                val updatedFolders = snapshots.documents.map { document ->
+                    mapToFolder(document.data as Map<String, Any>)
+                }
+
+                bigFolderList.clear()
+                bigFolderList.addAll(updatedFolders)
+                subFolderAdapter.updateList(folder.subFolders)
+            }
     }
 }

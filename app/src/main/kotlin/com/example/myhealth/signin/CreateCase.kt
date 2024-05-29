@@ -1,23 +1,20 @@
-package com.example.myhealth.MainFolder
+package com.example.myhealth.signin
 
 import android.annotation.SuppressLint
-import android.content.ContentValues.TAG
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
-import com.example.myhealth.utils.CurrentUser
 import com.example.myhealth.R
-import com.example.myhealth.utils.bigFolderList
+import com.example.myhealth.document.MainFolderActivity
+import com.example.myhealth.utils.CurrentUser
 import com.example.myhealth.utils.createNewFolder
 import com.example.myhealth.utils.folderName
 import com.example.myhealth.utils.openTextInputDialog
-import com.example.myhealth.utils.printFileStructure
 import com.example.myhealth.utils.showToast
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
@@ -91,20 +88,11 @@ class CreateCase : ComponentActivity() {
                     showToast(this, "Please select a case")
                     return@setOnClickListener
                 }
-                createNewFolder(folderName!!, LocalDate.now(), bigFolderList)
-                printFileStructure(bigFolderList[bigFolderList.size - 1])
+                createNewFolder(folderName!!, LocalDate.now())
                 showToast(this, "Case created")
-                val intent = Intent(this, MainFolder::class.java)
+                val intent = Intent(this, MainFolderActivity::class.java)
                 this.startActivity(intent)
-
-                db.collection("users").document(CurrentUser.instance.id).collection("cases")
-                    .add(bigFolderList[bigFolderList.size - 1])
-                    .addOnSuccessListener { result ->
-                        Log.d(TAG, "DocumentSnapshot added with ID: ${result.id}")
-                    }
-                    .addOnFailureListener { exception ->
-                        Log.w(TAG, "Error getting documents.", exception)
-                    }
+                println("CURRENT USER ID ${CurrentUser.instance.id}")
             }
         }
     }

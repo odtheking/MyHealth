@@ -14,16 +14,19 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
-import com.example.myhealth.document.DocumentActivity
 import com.example.myhealth.R
+import com.example.myhealth.document.DocumentActivity
 import com.example.myhealth.utils.SubFolder
 import com.example.myhealth.utils.bigFolderList
+import com.example.myhealth.utils.deleteSubFolder
+import com.example.myhealth.utils.editSubFolder
 import com.example.myhealth.utils.showToast
 import java.time.LocalDate
 
 class SubFolderAdapter(private var myObjects: List<SubFolder>) :
     RecyclerView.Adapter<SubFolderAdapter.MyObjectViewHolder>() {
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("NotifyDataSetChanged")
     fun updateList(newList: List<SubFolder>) {
         myObjects = newList
@@ -73,12 +76,11 @@ class SubFolderAdapter(private var myObjects: List<SubFolder>) :
             val position = adapterPosition
             if (position != RecyclerView.NO_POSITION) {
                 val intent = Intent(itemView.context, DocumentActivity::class.java)
-                intent.putExtra("position", position.toString())
-                intent.putExtra("positionFolder", intent.getStringExtra("position"))
+                intent.putExtra("folderId", intent.getStringExtra("folderId"))
+                intent.putExtra("subFolderId", myObjects[position].folderId)
                 itemView.context.startActivity(intent)
             }
         }
-
 
         @RequiresApi(Build.VERSION_CODES.O)
         private fun handleThreeDotsClick() {
@@ -115,17 +117,18 @@ class SubFolderAdapter(private var myObjects: List<SubFolder>) :
             val view: View = inflater.inflate(R.layout.dialog_text_input, null)
             val editText: EditText = view.findViewById(R.id.editText)
             val intent = Intent(context, SubFolderActivity::class.java)
-            val folderpos = intent.getStringExtra("positionFolder") ?: "0"
+            val folderId = intent.getStringExtra("folderId") ?: "0"
 
             builder.setView(view)
                 .setTitle("Enter Text")
                 .setPositiveButton("OK") { dialog, _ ->
-                    // Handle OK button click events here
                     val enteredText = editText.text.toString()
-                    bigFolderList[folderpos.toInt()].subFiles[position].name = enteredText
-                    notifyDataSetChanged()
+
                     if (enteredText.isNotEmpty()) {
                         showToast(context, "Entered Text: $enteredText")
+                        val folder = bigFolderList.find { it.folderId == folderId }?.subFolders?.get(position) ?: return@setPositiveButton
+                        folder.name = enteredText
+                        editSubFolder(folder.folderId, folder)
                     } else {
                         showToast(context, "Text is empty. Button text not changed.")
                     }
@@ -150,16 +153,16 @@ class SubFolderAdapter(private var myObjects: List<SubFolder>) :
             val view: View = inflater.inflate(R.layout.dialog_date_picker, null)
             val datePicker: DatePicker = view.findViewById(R.id.datePicker)
             val intent = Intent(context, SubFolderActivity::class.java)
-            val folderPos = intent.getStringExtra("positionFolder") ?: "0"
+            val folderId = intent.getStringExtra("folderId") ?: "0"
 
             builder.setView(view)
                 .setTitle("Select Date")
                 .setPositiveButton("OK") { dialog, _ ->
                     // Handle OK button click events here
                     val selectedDate = getDateFromDatePicker(datePicker)
-                    bigFolderList[folderPos.toInt()].subFiles[position].date = selectedDate
-                    notifyDataSetChanged()
-                    showToast(context, "Selected Date: $selectedDate")
+                    val folder = bigFolderList.find { it.folderId == folderId }?.subFolders?.get(position) ?: return@setPositiveButton
+                    folder.date = selectedDate
+                    editSubFolder(folder.folderId, folder)
                     dialog.dismiss()
                 }
                 .setNegativeButton("Cancel") { dialog, _ ->
@@ -182,16 +185,13 @@ class SubFolderAdapter(private var myObjects: List<SubFolder>) :
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("NotifyDataSetChanged")
     private fun removeFunction(context: Context, position: Int) {
         val intent = Intent(context, SubFolderActivity::class.java)
-        val folderpos = intent.getStringExtra("positionFolder") ?: "0"
+        val folderId = intent.getStringExtra("folderId") ?: "0"
 
-        bigFolderList[folderpos.toInt()].subFiles.remove(bigFolderList[folderpos.toInt()].subFiles[position])
-
-        notifyDataSetChanged()
+        deleteSubFolder(folderId, position)
         showToast(context, "Remove clicked for item at position $position")
     }
-
-
 }

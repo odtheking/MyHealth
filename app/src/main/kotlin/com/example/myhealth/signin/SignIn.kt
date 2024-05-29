@@ -10,9 +10,9 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import androidx.activity.ComponentActivity
-import com.example.myhealth.utils.CurrentUser
 import com.example.myhealth.MainMenu
 import com.example.myhealth.R
+import com.example.myhealth.utils.CurrentUser
 import com.example.myhealth.utils.showToast
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
