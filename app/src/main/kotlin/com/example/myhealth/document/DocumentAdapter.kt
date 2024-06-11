@@ -18,11 +18,11 @@ import com.example.myhealth.R
 import com.example.myhealth.utils.Document
 import com.example.myhealth.utils.bigFolderList
 import com.example.myhealth.utils.deleteDocument
-import com.example.myhealth.utils.editDocument
+import com.example.myhealth.utils.editFolder
 import com.example.myhealth.utils.showToast
 import java.time.LocalDate
 
-class DocumentAdapter(private var myObjects: List<Document>) :
+class DocumentAdapter(private var myObjects: List<Document>, private val folderId: String, private val subFolderPosition: Int) :
     RecyclerView.Adapter<DocumentAdapter.MyObjectViewHolder>() {
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -54,14 +54,6 @@ class DocumentAdapter(private var myObjects: List<Document>) :
         private val buttonThreeDots: Button = itemView.findViewById(R.id.buttonThreeDots)
 
         init {
-            // Set click listener for the entire item
-            itemView.setOnClickListener {
-                val position = adapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    // open document
-                }
-            }
-
             // Set click listener for the three-dots button
             buttonThreeDots.setOnClickListener {
                 handleThreeDotsClick(adapterPosition, itemView.context)
@@ -78,8 +70,6 @@ class DocumentAdapter(private var myObjects: List<Document>) :
     @RequiresApi(Build.VERSION_CODES.O)
     fun handleThreeDotsClick(position: Int, context: Context) {
         val options = arrayOf("Share", "Rename", "Change Date", "Remove")
-        // TODO (Implement folder sharing currently sharing a single string)
-
 
         // Create AlertDialog.Builder
         val builder = AlertDialog.Builder(context)
@@ -119,9 +109,6 @@ class DocumentAdapter(private var myObjects: List<Document>) :
 
         val view: View = inflater.inflate(R.layout.dialog_text_input, null)
         val editText: EditText = view.findViewById(R.id.editText)
-        val intent = Intent(context, DocumentActivity::class.java)
-        val folderId = intent.getStringExtra("folderId") ?: return
-        val subFolderId = intent.getStringExtra("subFolderId") ?: return
 
         builder.setView(view)
             .setTitle("Enter Text")
@@ -131,9 +118,9 @@ class DocumentAdapter(private var myObjects: List<Document>) :
 
                 if (enteredText.isNotEmpty()) {
                     showToast(context, "Entered Text: $enteredText")
-                    val document = bigFolderList.find { it.folderId == folderId }?.subFolders?.find { it.subFolderId == subFolderId }?.documents?.get(position) ?: return@setPositiveButton
+                    val document = bigFolderList.find { it.folderId == folderId }?.subFolders?.get(subFolderPosition)?.documents?.get(position) ?: return@setPositiveButton
                     document.name = enteredText
-                    editDocument(folderId, subFolderId, document)
+                    editFolder(bigFolderList.find { it.folderId == folderId } ?: return@setPositiveButton)
                 } else {
                     showToast(context, "Text is empty. Button text not changed.")
                 }
@@ -159,16 +146,13 @@ class DocumentAdapter(private var myObjects: List<Document>) :
 
         val view: View = inflater.inflate(R.layout.dialog_date_picker, null)
         val datePicker: DatePicker = view.findViewById(R.id.datePicker)
-        val intent = Intent(context, DocumentActivity::class.java)
-        val folderId = intent.getStringExtra("folderId") ?: return
-        val subFolderId = intent.getStringExtra("subFolderId") ?: return
 
         builder.setView(view)
             .setTitle("Select Date")
             .setPositiveButton("OK") { dialog, _ ->
                 val selectedDate = getDateFromDatePicker(datePicker)
-                val document = bigFolderList.find { it.folderId == folderId }?.subFolders?.find { it.subFolderId == subFolderId }?.documents?.get(position) ?: return@setPositiveButton
-                editDocument(folderId, subFolderId, document)
+                bigFolderList.find { it.folderId == folderId }?.subFolders?.get(subFolderPosition)?.documents?.get(position)?.date = selectedDate
+                editFolder(bigFolderList.find { it.folderId == folderId } ?: return@setPositiveButton)
                 showToast(context, "Selected Date: $selectedDate")
                 dialog.dismiss()
             }
@@ -194,11 +178,8 @@ class DocumentAdapter(private var myObjects: List<Document>) :
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("NotifyDataSetChanged")
     private fun removeFunction(context: Context, position: Int) {
-        val intent = Intent(context, DocumentActivity::class.java)
-        val folderId = intent.getStringExtra("folderId") ?: return
-        val subFolderId = intent.getStringExtra("subFolderId") ?: return
 
-        deleteDocument(folderId, subFolderId, position)
+        deleteDocument(folderId, subFolderPosition, position)
 
         showToast(context, "Remove clicked for item at position $position")
     }

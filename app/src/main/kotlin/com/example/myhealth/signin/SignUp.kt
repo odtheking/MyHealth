@@ -15,8 +15,6 @@ import com.example.myhealth.R
 import com.example.myhealth.utils.db
 import com.example.myhealth.utils.openNewActivity
 import com.example.myhealth.utils.showToast
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
 
 class SignUp : ComponentActivity() {
 
@@ -27,6 +25,7 @@ class SignUp : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
         sharePreference = getSharedPreferences("MyPrefsFile", MODE_PRIVATE) ?: return
+        val editor = sharePreference.edit()
 
         db.collection("users")
             .get()
@@ -35,6 +34,7 @@ class SignUp : ComponentActivity() {
                     if (document.data["email"] == sharePreference.getString("email", "") && document.data["password"] == sharePreference.getString("password", "")) {
                         this.startActivity(Intent(this, MainMenu::class.java))
                         showToast(this, "Login Successful")
+                        finish()
                     }
                     Log.d(TAG, "${document.id} => ${document.data}")
                 }
@@ -77,6 +77,13 @@ class SignUp : ComponentActivity() {
                         db.collection("users")
                             .add(user)
                             .addOnSuccessListener { documentReference ->
+
+                                editor.putBoolean("isLogged", true)
+                                editor.putString("email", email.text.toString())
+                                editor.putString("password", password.text.toString())
+                                editor.putString("id", documentReference.id)
+                                editor.apply()
+
                                 progressDialog.dismiss()
                                 showToast(this, "Account Created Successfully")
                                 this.startActivity(Intent(this, MainMenu::class.java))

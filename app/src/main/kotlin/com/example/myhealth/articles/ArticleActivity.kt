@@ -8,11 +8,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myhealth.R
-import okhttp3.*
+import okhttp3.Call
+import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import org.json.JSONObject
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 data class NewsItem(
     val title: String,
@@ -50,7 +55,10 @@ class ArticleActivity : AppCompatActivity() {
     }
 
     private fun fetchNewsData() {
-        val client = OkHttpClient()
+        val client = OkHttpClient.Builder()
+            .readTimeout(30, TimeUnit.SECONDS) // Adjust as needed
+            .connectTimeout(30, TimeUnit.SECONDS) // Adjust as needed
+            .build()
 
         val request = Request.Builder()
             .url("https://newsnow.p.rapidapi.com/newsv2_top_news_cat")

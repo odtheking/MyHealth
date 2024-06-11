@@ -87,18 +87,19 @@ class DocumentActivity : ComponentActivity() {
 
     private fun setupRecyclerView() {
         recyclerView.layoutManager = LinearLayoutManager(this)
-        documentAdapter = DocumentAdapter(emptyList()) // Initial empty list
+        val folderId = intent.getStringExtra("folderId") ?: ""
+        val subFolderPosition = intent.getIntExtra("subFolderPosition", 0)
+        documentAdapter = DocumentAdapter(emptyList(), folderId, subFolderPosition) // Initial empty list
         recyclerView.adapter = documentAdapter
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
     private fun setupCaseName() {
-        val folderId = intent.getStringExtra("folderId")
-        val subFolderId = intent.getStringExtra("subFolderId")
+        val folderId = intent.getStringExtra("folderId") ?: return
+        val subFolderPosition = intent.getIntExtra("subFolderPosition", 0)
         val folder = bigFolderList.find { it.folderId == folderId } ?: return
-        val subFolder = folder.subFolders.find { it.folderId == subFolderId } ?: return
-
+        val subFolder = folder.subFolders[subFolderPosition]
         caseNameTextView.text = "My ${subFolder.name}"
     }
 
@@ -140,8 +141,7 @@ class DocumentActivity : ComponentActivity() {
 
         when (requestCode) {
             PICK_FILE_REQUEST_CODE -> {
-                if (resultCode == Activity.RESULT_OK) {
-                    println("File picked")
+                if (resultCode == RESULT_OK) {
                     val selectedFileUri: Uri? = data?.data
                     if (selectedFileUri != null) {
                         // Get the file name from the URI
@@ -151,15 +151,14 @@ class DocumentActivity : ComponentActivity() {
                         val fileContent = readContentFromUri(selectedFileUri)
 
                         val folderId = intent.getStringExtra("folderId") ?: return
-                        val subFolderId = intent.getStringExtra("subFolderId") ?: return
-
+                        val subFolderPosition = intent.getIntExtra("subFolderPosition", 0)
                         createNewDocument(
                             fileName,
                             LocalDate.now(),
                             "pdf",
                             fileContent,
                             folderId,
-                            subFolderId
+                            subFolderPosition
                         )
                         showToast(this, "Document Added: $fileName")
                     }
@@ -244,9 +243,7 @@ class DocumentActivity : ComponentActivity() {
     private fun setupRealtimeUpdates() {
         if (CurrentUser.instance.id.isEmpty()) return
         val folderId = intent.getStringExtra("folderId")
-        val folder = bigFolderList.find { it.folderId == folderId } ?: return
-        val subFolderId = intent.getStringExtra("subFolderId")
-        val subFolder = folder.subFolders.find { it.folderId == subFolderId } ?: return
+        val subFolderPosition = intent.getIntExtra("subFolderPosition", 0)
         db.collection("users").document(CurrentUser.instance.id).collection("cases")
             .addSnapshotListener { snapshots, e ->
                 if (e != null) {
@@ -257,12 +254,12 @@ class DocumentActivity : ComponentActivity() {
                 if (snapshots == null) return@addSnapshotListener
 
                 val updatedFolders = snapshots.documents.map { document ->
-                    mapToFolder(document.data as Map<String, Any>)
+                    mapToFolder(document.data as Map<String, Any>, document.id)
                 }
 
                 bigFolderList.clear()
                 bigFolderList.addAll(updatedFolders)
-                documentAdapter.updateList(subFolder.documents)
+                documentAdapter.updateList(bigFolderList.find { it.folderId == folderId }?.subFolders?.get(subFolderPosition)?.documents ?: emptyList())
             }
     }
 }

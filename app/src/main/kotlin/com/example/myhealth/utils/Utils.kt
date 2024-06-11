@@ -5,7 +5,6 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
@@ -17,6 +16,7 @@ import com.example.myhealth.R
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import java.time.LocalDate
+import java.util.UUID
 
 fun openNewActivity(button: Button, context: Context, activityClass: Class<*>) = button.setOnClickListener { context.startActivity(Intent(context, activityClass)) }
 
@@ -58,42 +58,6 @@ fun openTextInputDialog(context: Context, buttonToUpdate: Button) {
 
 fun showToast(context: Context, message: String) {
     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-fun updateDBFiles(bigFolderList: List<Folder>) {
-    val userId = CurrentUser.instance.id
-
-    if (userId.isNullOrEmpty()) {
-        throw IllegalArgumentException("Invalid user ID.")
-    }
-
-    val userDocumentRef = db.collection("users").document(userId)
-    val casesCollectionRef = userDocumentRef.collection("cases")
-
-    // Step 1: Delete existing `cases` collection
-    casesCollectionRef.get().addOnSuccessListener { snapshot ->
-        val batch = db.batch()
-        for (document in snapshot.documents) {
-            batch.delete(document.reference)
-        }
-        batch.commit().addOnSuccessListener {
-            Log.d("TAG", "Existing cases collection deleted successfully!")
-            for (folder in bigFolderList) {
-                casesCollectionRef.add(folder)
-                    .addOnSuccessListener { documentReference ->
-                        Log.d("TAG", "DocumentSnapshot added with ID: ${documentReference.id}")
-                    }.addOnFailureListener { exception ->
-                        Log.w("TAG", "Error adding document", exception)
-                    }
-            }
-
-        }.addOnFailureListener { exception ->
-            Log.w("TAG", "Error deleting existing cases collection.", exception)
-        }
-    }.addOnFailureListener { exception ->
-        Log.w("TAG", "Error getting existing cases collection.", exception)
-    }
 }
 
 // Extension function to convert Folder object to a map
@@ -139,7 +103,7 @@ fun Document.toMap(): Map<String, Any> {
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun mapToFolder(map: Map<String, Any>): Folder {
+fun mapToFolder(map: Map<String, Any>, folderId: String): Folder {
     val dateMap = map["date"] as Map<String, Number>
     val date = LocalDate.of(dateMap["year"]!!.toInt(), dateMap["monthValue"]!!.toInt(), dateMap["dayOfMonth"]!!.toInt())
     val subFilesList = (map["subFiles"] as List<Map<String, Any>>).map { mapToSubFolder(it) }.toMutableList()
@@ -147,7 +111,7 @@ fun mapToFolder(map: Map<String, Any>): Folder {
         map["name"] as String,
         date,
         subFilesList,
-
+        folderId
     )
 }
 
@@ -160,7 +124,7 @@ fun mapToSubFolder(map: Map<String, Any>): SubFolder {
         map["name"] as String,
         date,
         documentsList,
-        map["id"].toString()
+        map["id"].toString(),
     )
 }
 
@@ -173,9 +137,9 @@ fun mapToDocument(map: Map<String, Any>): Document {
         date,
         map["content"] as String,
         map["fileType"] as String,
-        map["folderId"] as String,
-        map["subFolderId"] as String,
-        map["documentId"] as String
+        map["folderId"].toString(),
+        map["subFolderId"].toString().toIntOrNull() ?: 0,
+        map["documentId"].toString()
     )
 }
 
@@ -187,9 +151,3 @@ fun getDateFromDatePicker(datePicker: DatePicker): LocalDate {
     val day = datePicker.dayOfMonth
     return LocalDate.of(year, month, day)
 }
-
-
-
-
-
-

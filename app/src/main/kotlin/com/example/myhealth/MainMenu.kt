@@ -8,19 +8,16 @@ import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
-import androidx.work.Constraints
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import com.example.myhealth.articles.ArticleActivity
 import com.example.myhealth.calender.Appointment
-import com.example.myhealth.calender.AppointmentWorker
-import com.example.myhealth.main.MainFolderActivity
 import com.example.myhealth.calender.CalenderActivity
 import com.example.myhealth.calender.deleteAppointment
 import com.example.myhealth.calender.doctorsList
+import com.example.myhealth.main.MainFolderActivity
 import com.example.myhealth.signin.HomePage
 import com.example.myhealth.signin.SignUp
 import com.example.myhealth.utils.CurrentUser
@@ -30,7 +27,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.util.concurrent.TimeUnit
 
 /**
  * The main menu screen of the application.
@@ -55,6 +51,7 @@ class MainMenu : ComponentActivity() {
         // Check if user is logged in, if not, redirect to SignUp activity
         if (sharePreference.getString("email", "") == null) {
             this.startActivity(Intent(this, SignUp::class.java))
+            finish()
         } else if (sharePreference.getString("email", "") != null) {
             // If user is logged in, show progress dialog and fetch appointments
             val progressDialog = ProgressDialog(this)
@@ -68,8 +65,6 @@ class MainMenu : ComponentActivity() {
                     for (document in result) {
                         if (document.data["email"] == sharePreference.getString("email", "") && document.data["password"] == sharePreference.getString("password", "")) {
                             CurrentUser.createInstance(document.data["email"].toString(), document.data["password"].toString(), document.id)
-                            //this.startActivity(Intent(this, MainMenu::class.java))
-                            //fetchNewsData()
                             showToast(this, "Login Successful")
                         }
                         Log.d(TAG, "${document.id} => ${document.data}")
@@ -82,7 +77,12 @@ class MainMenu : ComponentActivity() {
                     Log.w(TAG, "Error getting documents.", exception)
                 }
         }
-
+        val threeDotsMenu = findViewById<ImageView>(R.id.dotsMenuButton)
+        threeDotsMenu.setOnClickListener {
+            sharePreference.edit().clear().apply()
+            this.startActivity(Intent(this, HomePage::class.java))
+            finish()
+        }
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
 
@@ -105,8 +105,13 @@ class MainMenu : ComponentActivity() {
             }
         }
 
-        // Schedule periodic appointment check
-        scheduleAppointmentCheck()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onBackPressed() {
+        fetchAppointments()
+        super.onBackPressed()
+        //finish()
     }
 
     /**
@@ -143,7 +148,6 @@ class MainMenu : ComponentActivity() {
     private fun updateSoonestAppointment() {
         val dateFormatter = DateTimeFormatter.ofPattern("d-M-yyyy")
         val soonestAppointment = doctorsList.minByOrNull { LocalDate.parse(it.date, dateFormatter) }
-        println("Soonest Appointment: $soonestAppointment, $doctorsList")
 
         // Update the TextViews with the soonest appointment details
         val nextAppointmentTextView = findViewById<TextView>(R.id.nextAppointmentTitleTextView)
@@ -151,7 +155,7 @@ class MainMenu : ComponentActivity() {
 
         if (soonestAppointment != null) {
             val daysUntilNextAppointment = ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(soonestAppointment.date, dateFormatter))
-            if (daysUntilNextAppointment < 0) deleteAppointment(soonestAppointment)
+            if (daysUntilNextAppointment <= 0) deleteAppointment(soonestAppointment)
             nextAppointmentTextView?.text = "Your next appointment is in $daysUntilNextAppointment days"
 
             val appointmentDateTime = "${soonestAppointment.date} - ${soonestAppointment.time}"
@@ -162,22 +166,6 @@ class MainMenu : ComponentActivity() {
             nextAppointmentTextView?.text = "No appointments scheduled"
             appointmentDetailsTextView?.text = ""
         }
-    }
-
-    /**
-     * Schedules a periodic check for appointments using WorkManager.
-     */
-    private fun scheduleAppointmentCheck() {
-        val constraints = Constraints.Builder()
-            .setRequiresCharging(false)
-            .setRequiresBatteryNotLow(true)
-            .build()
-
-        val workRequest = PeriodicWorkRequestBuilder<AppointmentWorker>(1, TimeUnit.DAYS)
-            .setConstraints(constraints)
-            .build()
-
-        WorkManager.getInstance(this).enqueue(workRequest)
     }
 }
 

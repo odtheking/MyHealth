@@ -91,7 +91,7 @@ class CreateCase : ComponentActivity() {
                 showToast(this, "Case created")
                 val intent = Intent(this, MainFolderActivity::class.java)
                 this.startActivity(intent)
-                println("CURRENT USER ID ${CurrentUser.instance.id}")
+                finish()
             }
         }
     }

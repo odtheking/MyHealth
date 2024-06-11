@@ -1,8 +1,14 @@
 package com.example.myhealth.calender
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.job.JobInfo
+import android.app.job.JobParameters
+import android.app.job.JobScheduler
+import android.app.job.JobService
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -11,28 +17,37 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.work.Worker
-import androidx.work.WorkerParameters
 import com.example.myhealth.R
 import com.example.myhealth.getSoonestAppointment
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-class AppointmentWorker(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
+@SuppressLint("SpecifyJobSchedulerIdRange")
+class AppointmentJobService : JobService() {
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun doWork(): Result {
-        // Fetch the next appointment
-        val soonestAppointment = getSoonestAppointment() // Replace with your method to fetch appointments
-        val dateFormatter = DateTimeFormatter.ofPattern("d-M-yyyy")
+    override fun onStartJob(params: JobParameters?): Boolean {
+        // Run the job on a background thread to avoid blocking the main thread
+        Thread {
+            val soonestAppointment = getSoonestAppointment() // Replace with your method to fetch appointments
+            val dateFormatter = DateTimeFormatter.ofPattern("d-M-yyyy")
 
-        if (soonestAppointment == null) return Result.success()
+            if (soonestAppointment != null) {
+                val daysUntilNextAppointment = ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(soonestAppointment.date, dateFormatter))
+                if (daysUntilNextAppointment < 0) sendNotification(soonestAppointment)
+            }
+            // Job finished
+            jobFinished(params, false)
+        }.start()
 
-        val daysUntilNextAppointment = ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(soonestAppointment.date, dateFormatter))
-        if (daysUntilNextAppointment < 0) sendNotification(soonestAppointment)
+        // Return true as the job is being executed in the background
+        return true
+    }
 
-        return Result.success()
+    override fun onStopJob(params: JobParameters?): Boolean {
+        // Return true to reschedule the job if it was terminated before completion
+        return true
     }
 
     private fun sendNotification(appointment: Appointment) {
@@ -67,17 +82,25 @@ class AppointmentWorker(context: Context, workerParams: WorkerParameters) : Work
                 description = descriptionText
             }
             val notificationManager: NotificationManager =
-                applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
     }
 
     private fun requestNotificationPermission() {
-        // Since we cannot directly request permissions from a Worker, you can either:
-        // 1. Schedule a task to request permissions in the main activity.
-        // 2. Handle the logic within the main activity.
-        // Here we will use a BroadcastReceiver approach to notify the activity.
         val intent = Intent("com.example.myhealth.REQUEST_NOTIFICATION_PERMISSION")
         applicationContext.sendBroadcast(intent)
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+fun scheduleAppointmentJob(context: Context) {
+    val componentName = ComponentName(context, AppointmentJobService::class.java)
+    val jobInfo = JobInfo.Builder(123, componentName)
+        .setPeriodic(15 * 60 * 1000) // Schedule job every 15 minutes
+        .setPersisted(true) // Persist across reboots
+        .build()
+
+    val jobScheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+    jobScheduler.schedule(jobInfo)
 }

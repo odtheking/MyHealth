@@ -15,8 +15,6 @@ import com.example.myhealth.R
 import com.example.myhealth.utils.CurrentUser
 import com.example.myhealth.utils.db
 import com.example.myhealth.utils.showToast
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
 
 class SignIn : ComponentActivity() {
 
@@ -35,9 +33,10 @@ class SignIn : ComponentActivity() {
             .addOnSuccessListener { result ->
                 for (document in result) {
                     if (document.data["email"] == sharePreference.getString("email", "") && document.data["password"] == sharePreference.getString("password", "")) {
-                        this.startActivity(Intent(this, MainMenu::class.java))
                         CurrentUser.createInstance(document.data["email"].toString(), document.data["password"].toString(), document.id)
+                        this.startActivity(Intent(this, MainMenu::class.java))
                         showToast(this, "Login Successful")
+                        finish()
                     }
                     Log.d(TAG, "${document.id} => ${document.data}")
                 }

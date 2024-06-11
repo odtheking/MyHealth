@@ -16,7 +16,7 @@ class Folder(var name: String, var date: LocalDate, var subFolders: MutableList<
 
 class SubFolder(var name: String, var date: LocalDate, var documents: MutableList<Document>, var folderId: String, var subFolderId: String = UUID.randomUUID().toString())
 
-data class Document(var name: String, var date: LocalDate, val content: String, val fileType: String, var folderId: String, var subFolderId: String, var documentId: String = UUID.randomUUID().toString())
+data class Document(var name: String, var date: LocalDate, val content: String, val fileType: String, var folderId: String, var subFolderId: Int, var documentId: String = UUID.randomUUID().toString())
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun createNewFolder(fileName: String, date: LocalDate = LocalDate.now()) {
@@ -29,7 +29,7 @@ fun createNewSubFolder(subFolderName: String, date: LocalDate = LocalDate.now(),
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun createNewDocument(fileName: String, date: LocalDate = LocalDate.now(), fileType: String, content: String, folderId: String, subFolderId: String) {
+fun createNewDocument(fileName: String, date: LocalDate = LocalDate.now(), fileType: String, content: String, folderId: String, subFolderId: Int) {
     addDocument(Document(fileName, date, content, fileType, folderId, subFolderId))
 }
 
@@ -38,7 +38,7 @@ fun addFolder(folder: Folder) {
     val folderMap = folder.toMap()
     db.collection("users").document(CurrentUser.instance.id).collection("cases").document(folder.folderId)
         .set(folderMap)
-        .addOnSuccessListener { documentReference ->
+        .addOnSuccessListener {
             addSubFolder(SubFolder("Test Results", LocalDate.now(), mutableListOf(), folder.folderId))
             addSubFolder(SubFolder("Summaries", LocalDate.now(), mutableListOf(), folder.folderId))
             addSubFolder(SubFolder("Prescriptions", LocalDate.now(), mutableListOf(), folder.folderId))
@@ -60,7 +60,7 @@ fun addSubFolder(subFolder: SubFolder) {
         val folderSnapshot = transaction.get(folderDoc)
         val folderData = folderSnapshot.data ?: throw Exception("Folder not found")
 
-        val folder = mapToFolder(folderData as Map<String, Any>)
+        val folder = mapToFolder(folderData as Map<String, Any>, folderDoc.id)
 
         folder.subFolders.add(subFolder)
 
@@ -82,10 +82,10 @@ fun addDocument(document: Document) {
         val folderData = folderSnapshot.data ?: throw Exception("Folder not found")
 
         // Convert the folder data to a Folder object
-        val folder = mapToFolder(folderData as Map<String, Any>)
+        val folder = mapToFolder(folderData as Map<String, Any>, folderDoc.id)
 
-        val subFolder = folder.subFolders.find { it.subFolderId == document.subFolderId }
-            ?: throw Exception("SubFolder not found")
+        val subFolder = folder.subFolders[document.subFolderId]
+            ?: throw Exception("SubFolder not found ${document.subFolderId} ${folder.subFolders.map { it.subFolderId }}")
 
         subFolder.documents.add(document)
 
@@ -113,67 +113,6 @@ fun editFolder(folder: Folder) {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-fun editSubFolder(folderId: String, subFolder: SubFolder) {
-    val userDoc = db.collection("users").document(CurrentUser.instance.id)
-    val folderDoc = userDoc.collection("cases").document(folderId)
-
-    db.runTransaction { transaction ->
-        val folderSnapshot = transaction.get(folderDoc)
-        val folderData = folderSnapshot.data ?: throw Exception("Folder not found")
-
-        // Convert the folder data to a Folder object
-        val folder = mapToFolder(folderData as Map<String, Any>)
-
-        // Find the subfolder and update its details
-        val subFolderIndex = folder.subFolders.indexOfFirst { it.name == subFolder.name }
-        if (subFolderIndex != -1) {
-            folder.subFolders[subFolderIndex] = subFolder
-        } else {
-            throw Exception("SubFolder not found")
-        }
-
-        // Update the folder in Firestore
-        transaction.set(folderDoc, folder.toMap())
-    }.addOnSuccessListener {
-        Log.d(TAG, "SubFolder updated successfully")
-    }.addOnFailureListener { e ->
-        Log.w(TAG, "Error updating subfolder", e)
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-fun editDocument(folderId: String, subFolderId: String, document: Document) {
-    val userDoc = db.collection("users").document(CurrentUser.instance.id)
-    val folderDoc = userDoc.collection("cases").document(folderId)
-
-    db.runTransaction { transaction ->
-        val folderSnapshot = transaction.get(folderDoc)
-        val folderData = folderSnapshot.data ?: throw Exception("Folder not found")
-
-        // Convert the folder data to a Folder object
-        val folder = mapToFolder(folderData as Map<String, Any>)
-
-        // Find the subfolder and update the document details
-        val subFolder = folder.subFolders.find { it.subFolderId == subFolderId }
-            ?: throw Exception("SubFolder not found")
-
-        val documentIndex = subFolder.documents.indexOfFirst { it.name == document.name }
-        if (documentIndex != -1) {
-            subFolder.documents[documentIndex] = document
-        } else {
-            throw Exception("Document not found")
-        }
-
-        // Update the folder in Firestore
-        transaction.set(folderDoc, folder.toMap())
-    }.addOnSuccessListener {
-        Log.d(TAG, "Document updated successfully")
-    }.addOnFailureListener { e ->
-        Log.w(TAG, "Error updating document", e)
-    }
-}
-
 fun deleteFolder(folderId: String) {
     db.collection("users").document(CurrentUser.instance.id).collection("cases").document(folderId)
         .delete()
@@ -195,7 +134,7 @@ fun deleteSubFolder(folderId: String, index: Int) {
         val folderData = folderSnapshot.data ?: throw Exception("Folder not found")
 
         // Convert the folder data to a Folder object
-        val folder = mapToFolder(folderData as Map<String, Any>)
+        val folder = mapToFolder(folderData as Map<String, Any>, folderDoc.id)
 
         // Remove the subfolder from the folder's subfolders list
         folder.subFolders.removeAt(index)
@@ -210,7 +149,7 @@ fun deleteSubFolder(folderId: String, index: Int) {
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun deleteDocument(folderId: String, subFolderId: String, index: Int) {
+fun deleteDocument(folderId: String, subFolderPosition: Int, index: Int) {
     val userDoc = db.collection("users").document(CurrentUser.instance.id)
     val folderDoc = userDoc.collection("cases").document(folderId)
 
@@ -219,11 +158,10 @@ fun deleteDocument(folderId: String, subFolderId: String, index: Int) {
         val folderData = folderSnapshot.data ?: throw Exception("Folder not found")
 
         // Convert the folder data to a Folder object
-        val folder = mapToFolder(folderData as Map<String, Any>)
+        val folder = mapToFolder(folderData as Map<String, Any>, folderDoc.id)
 
         // Find the subfolder and remove the document
-        val subFolder = folder.subFolders.find { it.subFolderId == subFolderId }
-            ?: throw Exception("SubFolder not found")
+        val subFolder = folder.subFolders[subFolderPosition]
 
         subFolder.documents.removeAt(index)
 
@@ -235,9 +173,6 @@ fun deleteDocument(folderId: String, subFolderId: String, index: Int) {
         Log.w(TAG, "Error deleting document", e)
     }
 }
-
-
-
 
 fun printFileStructure(file: Folder, depth: Int = 0) {
     println("${"\t".repeat(depth)}File: ${file.name} - ${file.date}")

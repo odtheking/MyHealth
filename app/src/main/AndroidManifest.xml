@@ -38,6 +38,10 @@
         <activity android:name=".signin.SignIn" />
         <activity android:name=".calender.CalenderActivity" />
         <activity android:name=".calender.AppointmentActivity" />
+        <service
+            android:name=".calender.AppointmentJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
     </application>
 
 </manifest>

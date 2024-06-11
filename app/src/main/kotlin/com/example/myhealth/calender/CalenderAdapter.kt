@@ -19,7 +19,6 @@ import com.example.myhealth.utils.CurrentUser
 import com.example.myhealth.utils.db
 import com.example.myhealth.utils.getDateFromDatePicker
 import com.example.myhealth.utils.showToast
-import java.util.Calendar
 
 class CalenderAdapter(private var myObjects: List<Appointment>) :
     RecyclerView.Adapter<CalenderAdapter.MyObjectViewHolder>() {

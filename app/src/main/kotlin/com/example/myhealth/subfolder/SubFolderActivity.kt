@@ -61,7 +61,8 @@ class SubFolderActivity : ComponentActivity() {
 
     private fun setupRecyclerView() {
         recyclerView.layoutManager = LinearLayoutManager(this)
-        subFolderAdapter = SubFolderAdapter(emptyList()) // Initial empty list
+        val folderId = intent.getStringExtra("folderId") ?: ""
+        subFolderAdapter = SubFolderAdapter(emptyList(), folderId) // Initial empty list
         recyclerView.adapter = subFolderAdapter
     }
 
@@ -69,8 +70,9 @@ class SubFolderActivity : ComponentActivity() {
     @SuppressLint("SetTextI18n")
     private fun setupCaseName() {
         val folderId = intent.getStringExtra("folderId")
-        println("bigFolderList: ${bigFolderList.map { it.name }}, folderId: $folderId")
         val folder = bigFolderList.find { it.folderId == folderId } ?: return
+        println("bigFolderList: $bigFolderList")
+        println(folder.name)
         caseNameTextView.text = "My ${folder.name}"
     }
 
@@ -127,8 +129,7 @@ class SubFolderActivity : ComponentActivity() {
 
                 if (enteredText.isNotEmpty()) {
                     val folderId = intent.getStringExtra("folderId")
-                    println("FOLDER ID: $folderId, bigfolder folderid: ${bigFolderList.map { it.folderId }}")
-                    val folder = bigFolderList.find { it.folderId == folderId } ?: return@setPositiveButton println("FOLDER ID: $folderId, BIG FOLDER LIST: $bigFolderList")
+                    val folder = bigFolderList.find { it.folderId == folderId } ?: return@setPositiveButton
 
                     createNewSubFolder(enteredText, folderId = folder.folderId)
                     showToast(this, "Entered Text: $enteredText")
@@ -175,7 +176,6 @@ class SubFolderActivity : ComponentActivity() {
     private fun setupRealtimeUpdates() {
         if (CurrentUser.instance.id.isEmpty()) return
         val folderId = intent.getStringExtra("folderId")
-        val folder = bigFolderList.find { it.folderId == folderId } ?: return
         db.collection("users").document(CurrentUser.instance.id).collection("cases")
             .addSnapshotListener { snapshots, e ->
                 if (e != null) {
@@ -186,12 +186,12 @@ class SubFolderActivity : ComponentActivity() {
                 if (snapshots == null) return@addSnapshotListener
 
                 val updatedFolders = snapshots.documents.map { document ->
-                    mapToFolder(document.data as Map<String, Any>)
+                    mapToFolder(document.data as Map<String, Any>, document.id)
                 }
 
                 bigFolderList.clear()
                 bigFolderList.addAll(updatedFolders)
-                subFolderAdapter.updateList(folder.subFolders)
+                subFolderAdapter.updateList(bigFolderList.find { it.folderId == folderId }?.subFolders ?: emptyList())
             }
     }
 }

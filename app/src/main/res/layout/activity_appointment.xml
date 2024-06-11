@@ -81,7 +81,6 @@
             android:hint="Select Time"
             android:textSize="16sp"
             android:background="#AC1BC5"
-
             android:padding="8dp"
              />
 

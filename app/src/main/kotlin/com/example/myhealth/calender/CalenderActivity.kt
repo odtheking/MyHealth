@@ -56,6 +56,7 @@ class CalenderActivity : ComponentActivity() {
         setupRecyclerView()
         setupSortSpinner()
         setupRealtimeUpdates()
+        scheduleAppointmentJob(this)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

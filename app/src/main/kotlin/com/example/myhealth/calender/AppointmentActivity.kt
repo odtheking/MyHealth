@@ -89,8 +89,7 @@ class AppointmentActivity : ComponentActivity() {
                 ).addOnSuccessListener {
                     Toast.makeText(this, "Appointment Created", Toast.LENGTH_SHORT).show()
                     this.startActivity(Intent(this, CalenderActivity::class.java))
-
-                    //finish()
+                    finish()
                 }
         }
     }

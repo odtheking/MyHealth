@@ -1,6 +1,7 @@
 package com.example.myhealth.main
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Build
@@ -73,9 +74,10 @@ class FolderAdapter(private var myObjects: List<Folder>) :
             val position = adapterPosition
             if (position != RecyclerView.NO_POSITION) {
                 val intent = Intent(itemView.context, SubFolderActivity::class.java)
-                intent.putExtra("folderId", myObjects[position].folderId)
-                println("putting id: ${myObjects[position].folderId}")
+                println("FIRST PUTTING EXTRA ${bigFolderList[position].folderId}")
+                intent.putExtra("folderId", bigFolderList[position].folderId)
                 itemView.context.startActivity(intent)
+                (itemView.context as Activity).finish()
             }
         }
 

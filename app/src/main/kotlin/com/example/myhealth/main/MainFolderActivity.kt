@@ -127,7 +127,7 @@ class MainFolderActivity : ComponentActivity() {
                 if (snapshots == null) return@addSnapshotListener
 
                 val updatedFolders = snapshots.documents.map { document ->
-                    mapToFolder(document.data as Map<String, Any>)
+                    mapToFolder(document.data as Map<String, Any>, document.id)
                 }
 
                 bigFolderList.clear()
