@@ -74,7 +74,6 @@ class FolderAdapter(private var myObjects: List<Folder>) :
             val position = adapterPosition
             if (position != RecyclerView.NO_POSITION) {
                 val intent = Intent(itemView.context, SubFolderActivity::class.java)
-                println("FIRST PUTTING EXTRA ${bigFolderList[position].folderId}")
                 intent.putExtra("folderId", bigFolderList[position].folderId)
                 itemView.context.startActivity(intent)
                 (itemView.context as Activity).finish()

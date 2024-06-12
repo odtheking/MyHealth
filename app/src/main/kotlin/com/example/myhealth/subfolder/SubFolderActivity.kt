@@ -71,8 +71,6 @@ class SubFolderActivity : ComponentActivity() {
     private fun setupCaseName() {
         val folderId = intent.getStringExtra("folderId")
         val folder = bigFolderList.find { it.folderId == folderId } ?: return
-        println("bigFolderList: $bigFolderList")
-        println(folder.name)
         caseNameTextView.text = "My ${folder.name}"
     }
 
