@@ -91,14 +91,17 @@ class MainMenu : ComponentActivity() {
             when (item.itemId) {
                 R.id.nav_drive -> {
                     this.startActivity(Intent(this, MainFolderActivity::class.java))
+                    fetchAppointments()
                     false
                 }
                 R.id.nav_calendar -> {
                     this.startActivity(Intent(this, CalenderActivity::class.java))
+                    fetchAppointments()
                     false
                 }
                 R.id.nav_document -> {
                     this.startActivity(Intent(this, ArticleActivity::class.java))
+                    fetchAppointments()
                     false
                 }
                 else -> false
@@ -107,19 +110,12 @@ class MainMenu : ComponentActivity() {
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    override fun onBackPressed() {
-        fetchAppointments()
-        super.onBackPressed()
-        //finish()
-    }
-
     /**
      * Fetches the user's appointments from Firestore.
      */
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("NotifyDataSetChanged")
-    private fun fetchAppointments() {
+    fun fetchAppointments() {
         if (CurrentUser.instance.id.isEmpty()) return
         db.collection("users").document(CurrentUser.instance.id).collection("appointments")
             .get()

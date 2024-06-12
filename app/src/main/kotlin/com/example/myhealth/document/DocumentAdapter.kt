@@ -81,7 +81,6 @@ class DocumentAdapter(private var myObjects: List<Document>, private val folderI
         }
     }
 
-
     @RequiresApi(Build.VERSION_CODES.O)
     fun handleThreeDotsClick(position: Int, context: Context) {
         val options = arrayOf( "Rename", "Change Date", "Remove")
