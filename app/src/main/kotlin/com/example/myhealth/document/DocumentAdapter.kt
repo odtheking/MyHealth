@@ -63,8 +63,8 @@ class DocumentAdapter(private var myObjects: List<Document>, private val folderI
             itemView.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
-                    val content = myObjects[position].content
-                    val pdfFile = saveContentToTempFile(itemView.context, content)
+                    val document = bigFolderList.find { it.folderId == folderId }?.subFolders?.get(subFolderPosition)?.documents?.get(position) ?: return@setOnClickListener
+                    val pdfFile = saveContentToTempFile(itemView.context, document.content, document.name)
                     openPdfWithChooser(itemView.context, pdfFile)
                 }
             }
@@ -84,17 +84,17 @@ class DocumentAdapter(private var myObjects: List<Document>, private val folderI
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun handleThreeDotsClick(position: Int, context: Context) {
-        val options = arrayOf("Share", "Rename", "Change Date", "Remove")
+        val options = arrayOf( "Rename", "Change Date", "Remove")
 
         // Create AlertDialog.Builder
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Options")
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> shareFunction(context)
-                    1 -> renameFunction(context, position)
-                    2 -> changeDateFunction(context, position)
-                    3 -> removeFunction(context, position)
+                    3 -> shareFunction(context)
+                    0 -> renameFunction(context, position)
+                    1 -> changeDateFunction(context, position)
+                    2 -> removeFunction(context, position)
                 }
             }
             .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
@@ -116,16 +116,9 @@ class DocumentAdapter(private var myObjects: List<Document>, private val folderI
         }
     }
 
-    fun readContentFromUri(uri: Uri, contentResolver: ContentResolver): String {
-        val inputStream: InputStream? = contentResolver.openInputStream(uri)
-        val content = inputStream?.bufferedReader().use { it?.readText() } ?: ""
-        inputStream?.close()
-        return content
-    }
-
-    fun saveContentToTempFile(context: Context, pdfContent: String): File {
-        val tempFile = File(context.cacheDir, "temp.pdf")
-        tempFile.writeText(pdfContent)
+    fun saveContentToTempFile(context: Context, pdfContent: String, fileName: String): File {
+        val tempFile = File(context.cacheDir, fileName)
+        tempFile.writeBytes(pdfContent.toByteArray())
         return tempFile
     }
 
