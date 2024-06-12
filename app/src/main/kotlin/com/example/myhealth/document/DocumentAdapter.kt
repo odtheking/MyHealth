@@ -2,8 +2,10 @@ package com.example.myhealth.document
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +15,7 @@ import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myhealth.R
 import com.example.myhealth.utils.Document
@@ -20,6 +23,8 @@ import com.example.myhealth.utils.bigFolderList
 import com.example.myhealth.utils.deleteDocument
 import com.example.myhealth.utils.editFolder
 import com.example.myhealth.utils.showToast
+import java.io.File
+import java.io.InputStream
 import java.time.LocalDate
 
 class DocumentAdapter(private var myObjects: List<Document>, private val folderId: String, private val subFolderPosition: Int) :
@@ -54,6 +59,16 @@ class DocumentAdapter(private var myObjects: List<Document>, private val folderI
         private val buttonThreeDots: Button = itemView.findViewById(R.id.buttonThreeDots)
 
         init {
+
+            itemView.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val content = myObjects[position].content
+                    val pdfFile = saveContentToTempFile(itemView.context, content)
+                    openPdfWithChooser(itemView.context, pdfFile)
+                }
+            }
+
             // Set click listener for the three-dots button
             buttonThreeDots.setOnClickListener {
                 handleThreeDotsClick(adapterPosition, itemView.context)
@@ -99,6 +114,30 @@ class DocumentAdapter(private var myObjects: List<Document>, private val folderI
         } catch (e: Exception) {
             showToast(context, "Error sharing: ${e.message}")
         }
+    }
+
+    fun readContentFromUri(uri: Uri, contentResolver: ContentResolver): String {
+        val inputStream: InputStream? = contentResolver.openInputStream(uri)
+        val content = inputStream?.bufferedReader().use { it?.readText() } ?: ""
+        inputStream?.close()
+        return content
+    }
+
+    fun saveContentToTempFile(context: Context, pdfContent: String): File {
+        val tempFile = File(context.cacheDir, "temp.pdf")
+        tempFile.writeText(pdfContent)
+        return tempFile
+    }
+
+    fun openPdfWithChooser(context: Context, pdfFile: File) {
+        val pdfUri: Uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", pdfFile)
+
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.setDataAndType(pdfUri, "application/pdf")
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+        val chooser = Intent.createChooser(intent, "Open PDF with")
+        context.startActivity(chooser)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

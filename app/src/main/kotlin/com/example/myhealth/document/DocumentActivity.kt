@@ -39,12 +39,6 @@ class DocumentActivity : ComponentActivity() {
     private lateinit var documentAdapter: DocumentAdapter
     private lateinit var caseNameTextView: TextView
 
-    companion object {
-        const val SORT_BY_DATE = 0
-        const val SORT_BY_NAME_ASCENDING = 1
-        const val SORT_BY_NAME_DESCENDING = 2
-    }
-
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n", "MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,7 +54,7 @@ class DocumentActivity : ComponentActivity() {
         val plusButton = findViewById<View>(R.id.circleButton)
         plusButton.setOnClickListener {
 
-            val options = arrayOf("Upload", "Scan")
+            val options = arrayOf("Upload")
 
             // Create AlertDialog.Builder
             val builder = AlertDialog.Builder(this)
@@ -194,11 +188,15 @@ class DocumentActivity : ComponentActivity() {
     private fun uploadFunction() {
         // Create an intent to open the file picker
         val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.type = "*/*"  // Set the MIME type to all files
+        intent.type = "application/pdf"  // Set the MIME type to PDF
+
+        // Optionally, you can add a chooser to make it clearer to the user that they should pick a PDF file
+        val chooser = Intent.createChooser(intent, "Select a PDF file")
 
         // Start the file picker activity
-        startActivityForResult(intent, PICK_FILE_REQUEST_CODE)
+        startActivityForResult(chooser, PICK_FILE_REQUEST_CODE)
     }
+
 
     private fun scanFunction() {
         // Create an intent to open the camera
