@@ -1,7 +1,6 @@
 
 <p align="center">
   <img src="https://github.com/odtheking/MyHealth/blob/main/MyHealth%20Logo.png?raw=true" alt="Sublime's custom image" width="200" height="200"/>
-
 </p>
 
 ## MyHealth: Your Personalized Medical Organizer
@@ -31,23 +30,6 @@
 * **Regular updates:** We're constantly adding new features and improvements to enhance your experience.
 
 **Download MyHealth today and experience the freedom of organized medical care!**
-
-**Get MyHealth:** [Link to Google Play Store]
-
-**Screenshots:**
-
-
-
-**Tech Stack:**
-
-* Kotlin
-* Android Jetpack
-* Room Database
-* Retrofit (optional for future online features)
-
-**Contributing:**
-
-We welcome contributions from the community! Fork this repository and submit pull requests to help us make MyHealth even better.
 
 **License:**
 
