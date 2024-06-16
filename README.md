@@ -27,9 +27,7 @@
 * **Offline access:** View your records anytime, anywhere, even without an internet connection.
 * **Powerful search and filter options:** Find specific information quickly and easily.
 * **Export and import capabilities:** Share your data with other apps or platforms.
-* **Regular updates:** We're constantly adding new features and improvements to enhance your experience.
-
-**Download MyHealth today and experience the freedom of organized medical care!**
+* **Regular updates:** We're constantly adding new features and improvements to enhance your 
 
 **License:**
 
